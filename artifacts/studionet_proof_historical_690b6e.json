@@ -1,0 +1,53 @@
+{
+  "network": "studionet",
+  "chain_id": 61999,
+  "rpc": "https://studio.genlayer.com/api",
+  "cli_version": "0.39.1",
+  "explorer_base": "https://genlayer-explorer.vercel.app",
+  "contract": {
+    "name": "ParetoRail",
+    "address": "0x3cF4773bAC377CeaA3f90b5AE3bC1E317F315411",
+    "source_sha256": "f19d28c009259ddf22c289936beb43b7d7c064dcaa83f69e7049ff314580215d",
+    "source_bytes": 23686,
+    "deployment_tx": "0xf054cc46ea3677d9aa5aa5012f1393fc644bc871beb96252ccd72a4472db13cd",
+    "receipt": "FINALIZED / MAJORITY_AGREE / SUCCESS",
+    "source_parity": "gen_getContractCode exact byte and SHA-256 match"
+  },
+  "consumer": {
+    "name": "AmendedActionGate",
+    "address": "0xd3b91F93ECE55c188D2E8938A37cF35ded583f39",
+    "source_sha256": "2044110f4e6c20ade3335eabaf1765be71738440713ac6f81b6773fe4dc55c7c",
+    "source_bytes": 1210,
+    "deployment_tx": "0x822d7b52af0b3fae3878e29f1b37f159fa77bbbc62bb4f4eec464e59c5bc8eb3",
+    "receipt": "FINALIZED / MAJORITY_AGREE / SUCCESS",
+    "bound_paretorail": "0x3cF4773bAC377CeaA3f90b5AE3bC1E317F315411",
+    "proposal_id": 4,
+    "expected_head": "cda68fa595c6064411be0eed3b0a888a5872551c8ac4d9f1418807061e402cdd",
+    "source_parity": "gen_getContractCode exact byte and SHA-256 match"
+  },
+  "agreement": {
+    "id": 2,
+    "creator": "0x951e6B75530774fF82321a5ae54e14F778F0C855",
+    "parties": [
+      {"role": "Buyer", "wallet": "0x951e6B75530774fF82321a5ae54e14F778F0C855"},
+      {"role": "Supplier", "wallet": "0xB845a69860ba4CDf19CfDC5AfbAF2e20b6bE86b0"},
+      {"role": "Referrer", "wallet": "0xac3AC69dC0Bde389256dD6748C75817ead9286D9"}
+    ],
+    "quorum": 2,
+    "sealed": {"version": 1, "genesis_hash": "24e940651052b794062953b48da74eb3fde27b8d723f3401e6df4120e1536071", "head_hash": "f8c280b8c7e1522551d469de93191f79c664d927611dff68444c4684c77594fa"},
+    "final": {"version": 3, "head_hash": "cda68fa595c6064411be0eed3b0a888a5872551c8ac4d9f1418807061e402cdd", "proposal_ids": [1, 2, 3, 4]}
+  },
+  "lifecycle": {
+    "create_agreement_tx": "0x9e744a8c2309656b4038479a0b4109dcb5fe274d0a2107b76e16be6ea8aa2729",
+    "referrer_add_party_tx": "0xfb8b877f409a3b44027c4ba53a98de5da5325d8f4515998ac987bd744be3d799",
+    "attestation_txs": ["0xe4d433455296600a2be8acb78aa69065b1792fc49599e60e08c0fa6c8e006d27", "0x66be826f6d579c5f485e702070464df1d1d6e40258047defebbe6e25d6b20654", "0x5b8add132ed501f313bf111a7240cf09128d9ea9498835e8317eb981a6f52756"],
+    "seal_tx": "0x7a4009a3a9d04dcf19801c731c40700bcaa1187f45e51ec29429b3526e899c64",
+    "harmed_proposal": {"id": 3, "tx": "0x4f2ffc428f44e51734a52d38555716354b2f3302baf032cff3008536208fab42", "impact_vector": "BWN", "impacted_mask": 2, "quorum_readback": {"approval_mask": 5, "finalizable": false}, "approval_txs": ["0xd010064c5a35226b02c60c6756780d66933b5fd67bfde41184fb46fcdfef6e56", "0x8d16775f02656f20abc577f4c32c212400f5836ac0b48f95feb2e57fc19f9c14", "0x3cc3a0580a46531b9bf7c15dcbcd28a370343ed2c3857b176d08ea84eda1a236"], "finalize_tx": "0x14148f59d5df31ceb7b2209524ff5cff16d70886702ef4856fc111eece619332", "adopted_head": "c42256f33d2602b7bac4f14fc620d189f648ac3ba3ff17197aa855c3a1140c4b"},
+    "non_harming_proposal": {"id": 4, "tx": "0xf3f43420aa9fdbc52a21453b7952600942ca84d83585c6311cb2ee2e6544dad9", "impact_vector": "NNN", "approval_txs": ["0x2a9999ce9ba24bd291e63f4cd05f6f313affaa5ae893f9ebc1afc790ac6641a0", "0x0906634181eff2917a603803c5d301e7f7f0130c6b30a9c30f1c0d93992271bb"], "finalize_tx": "0x0e0be3a65d1aa4c96f0ea9d3f372285b39fe12e3ccf2318bb0f04cdf6e86325f", "adopted_head": "cda68fa595c6064411be0eed3b0a888a5872551c8ac4d9f1418807061e402cdd"},
+    "stale_rejection": {"tx": "0xb79d91907f6516d9eb48c5d542c0c67751e564b09798327cdb54e9cf1cd37cb8", "finality": "FINALIZED", "execution": "ERROR", "error": "STALE_PROPOSAL"},
+    "hidden_worsening_rejection": {"tx": "0xe274c479452f285ea91e178d966d039c295aff6310ceafeb25c44c8884412794", "finality": "FINALIZED", "result": "MAJORITY_DISAGREE", "state_change": false},
+    "ambiguity_rejection": {"tx": "0x414010d85c73d86636a8daa2ebbb59d122297b660074f150e032e305247e63c6", "finality": "FINALIZED", "result": "MAJORITY_DISAGREE", "state_change": false},
+    "consumer": {"perform_tx": "0xf3230bc4cafa8237f595667634cc9dda5251279ee343d225b087505e9b12ec9b", "performed": true, "replay_tx": "0x2ef4552024ab6748dd88b0aed337d7fdf68d0f1ab3ed10f94e521013b6ab189f", "replay_error": "ALREADY_PERFORMED"}
+  },
+  "limitations": ["The Supplier add-party hash was not retained by the CLI output and is intentionally omitted rather than guessed.", "The live fixture is repository-controlled evidence, not independent commercial-market proof.", "Leader rationale and witness are LEADER_REPORTED_NOT_CERTIFIED; the impact vector is the decision-bearing output."]
+}

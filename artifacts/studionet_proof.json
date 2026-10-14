@@ -3,51 +3,83 @@
   "chain_id": 61999,
   "rpc": "https://studio.genlayer.com/api",
   "cli_version": "0.39.1",
-  "explorer_base": "https://genlayer-explorer.vercel.app",
+  "genvm_version": "v0.2.12",
+  "source_commit": "83a2dbb53e247e54aa73f3224c174dcf6b1625f5",
+  "verification_ci": "https://github.com/ometere123/paretorail/actions/runs/38605324552",
   "contract": {
     "name": "ParetoRail",
-    "address": "0x3cF4773bAC377CeaA3f90b5AE3bC1E317F315411",
-    "source_sha256": "f19d28c009259ddf22c289936beb43b7d7c064dcaa83f69e7049ff314580215d",
-    "source_bytes": 23686,
-    "deployment_tx": "0xf054cc46ea3677d9aa5aa5012f1393fc644bc871beb96252ccd72a4472db13cd",
+    "address": "0x45df5A40bf702306bd9A30Ae5Bec1847C2e6efE1",
+    "source_sha256": "f96cd5dc10d5ddbdfad3d573b50eb2533cda8d82c88695a47d6480b2199f0a32",
+    "source_bytes": 26200,
+    "deployment_tx": "0xec1809fb315effc9b7a37212fe508a2f005a0a16479e42bcfd6efb455f9f270d",
     "receipt": "FINALIZED / MAJORITY_AGREE / SUCCESS",
-    "source_parity": "gen_getContractCode exact byte and SHA-256 match"
+    "source_parity": "gen_getContractCode decoded exact byte and SHA-256 match",
+    "deployment_explorer": "https://explorer-studio.genlayer.com"
   },
   "consumer": {
     "name": "AmendedActionGate",
-    "address": "0xd3b91F93ECE55c188D2E8938A37cF35ded583f39",
+    "address": "0xAA543bF4395A87A744fc4b5813BA6cc8960C18AE",
     "source_sha256": "2044110f4e6c20ade3335eabaf1765be71738440713ac6f81b6773fe4dc55c7c",
     "source_bytes": 1210,
-    "deployment_tx": "0x822d7b52af0b3fae3878e29f1b37f159fa77bbbc62bb4f4eec464e59c5bc8eb3",
+    "deployment_tx": "0x3a0948c43ff77efe22d3c57af30254f6b48604b76f28346a49f04fdb12e99a24",
     "receipt": "FINALIZED / MAJORITY_AGREE / SUCCESS",
-    "bound_paretorail": "0x3cF4773bAC377CeaA3f90b5AE3bC1E317F315411",
-    "proposal_id": 4,
-    "expected_head": "cda68fa595c6064411be0eed3b0a888a5872551c8ac4d9f1418807061e402cdd",
-    "source_parity": "gen_getContractCode exact byte and SHA-256 match"
+    "bound_paretorail": "0x45df5A40bf702306bd9A30Ae5Bec1847C2e6efE1",
+    "proposal_id": 2,
+    "expected_head": "416b1751429f20d20e5c3c3edb6c884dd5fd36e5ff287fd51e4f6a643d5c8138",
+    "source_parity": "gen_getContractCode decoded exact byte and SHA-256 match"
+  },
+  "accounts": {
+    "buyer_creator": "0x951e6B75530774fF82321a5ae54e14F778F0C855",
+    "supplier": "0xB845a69860ba4CDf19CfDC5AfbAF2e20b6bE86b0",
+    "referrer": "0xac3AC69dC0Bde389256dD6748C75817ead9286D9"
   },
   "agreement": {
-    "id": 2,
-    "creator": "0x951e6B75530774fF82321a5ae54e14F778F0C855",
-    "parties": [
-      {"role": "Buyer", "wallet": "0x951e6B75530774fF82321a5ae54e14F778F0C855"},
-      {"role": "Supplier", "wallet": "0xB845a69860ba4CDf19CfDC5AfbAF2e20b6bE86b0"},
-      {"role": "Referrer", "wallet": "0xac3AC69dC0Bde389256dD6748C75817ead9286D9"}
-    ],
+    "id": 1,
+    "purpose": "Three-party delivery and referral covenant",
+    "baseline_terms": "Buyer pays 50 GEN. Supplier delivers the service within five days. Referrer receives a ten percent referral share.",
+    "current_terms": "Buyer pays 50 GEN. Supplier delivers the service within five days. Referrer receives a ten percent referral share. Written notices are permitted",
     "quorum": 2,
-    "sealed": {"version": 1, "genesis_hash": "24e940651052b794062953b48da74eb3fde27b8d723f3401e6df4120e1536071", "head_hash": "f8c280b8c7e1522551d469de93191f79c664d927611dff68444c4684c77594fa"},
-    "final": {"version": 3, "head_hash": "cda68fa595c6064411be0eed3b0a888a5872551c8ac4d9f1418807061e402cdd", "proposal_ids": [1, 2, 3, 4]}
+    "sealed": true,
+    "genesis_hash": "696cf2dfc942eab28678d6a961e0c0b881174d8e72ccf9978333ff3c5849e5b0",
+    "initial_head": "b820521e28def101514965baf518da6f22d938ea64f272070f10d6b73b052293",
+    "final_version": 3,
+    "final_head": "416b1751429f20d20e5c3c3edb6c884dd5fd36e5ff287fd51e4f6a643d5c8138",
+    "proposal_ids": [1, 2, 3]
   },
   "lifecycle": {
-    "create_agreement_tx": "0x9e744a8c2309656b4038479a0b4109dcb5fe274d0a2107b76e16be6ea8aa2729",
-    "referrer_add_party_tx": "0xfb8b877f409a3b44027c4ba53a98de5da5325d8f4515998ac987bd744be3d799",
-    "attestation_txs": ["0xe4d433455296600a2be8acb78aa69065b1792fc49599e60e08c0fa6c8e006d27", "0x66be826f6d579c5f485e702070464df1d1d6e40258047defebbe6e25d6b20654", "0x5b8add132ed501f313bf111a7240cf09128d9ea9498835e8317eb981a6f52756"],
-    "seal_tx": "0x7a4009a3a9d04dcf19801c731c40700bcaa1187f45e51ec29429b3526e899c64",
-    "harmed_proposal": {"id": 3, "tx": "0x4f2ffc428f44e51734a52d38555716354b2f3302baf032cff3008536208fab42", "impact_vector": "BWN", "impacted_mask": 2, "quorum_readback": {"approval_mask": 5, "finalizable": false}, "approval_txs": ["0xd010064c5a35226b02c60c6756780d66933b5fd67bfde41184fb46fcdfef6e56", "0x8d16775f02656f20abc577f4c32c212400f5836ac0b48f95feb2e57fc19f9c14", "0x3cc3a0580a46531b9bf7c15dcbcd28a370343ed2c3857b176d08ea84eda1a236"], "finalize_tx": "0x14148f59d5df31ceb7b2209524ff5cff16d70886702ef4856fc111eece619332", "adopted_head": "c42256f33d2602b7bac4f14fc620d189f648ac3ba3ff17197aa855c3a1140c4b"},
-    "non_harming_proposal": {"id": 4, "tx": "0xf3f43420aa9fdbc52a21453b7952600942ca84d83585c6311cb2ee2e6544dad9", "impact_vector": "NNN", "approval_txs": ["0x2a9999ce9ba24bd291e63f4cd05f6f313affaa5ae893f9ebc1afc790ac6641a0", "0x0906634181eff2917a603803c5d301e7f7f0130c6b30a9c30f1c0d93992271bb"], "finalize_tx": "0x0e0be3a65d1aa4c96f0ea9d3f372285b39fe12e3ccf2318bb0f04cdf6e86325f", "adopted_head": "cda68fa595c6064411be0eed3b0a888a5872551c8ac4d9f1418807061e402cdd"},
-    "stale_rejection": {"tx": "0xb79d91907f6516d9eb48c5d542c0c67751e564b09798327cdb54e9cf1cd37cb8", "finality": "FINALIZED", "execution": "ERROR", "error": "STALE_PROPOSAL"},
-    "hidden_worsening_rejection": {"tx": "0xe274c479452f285ea91e178d966d039c295aff6310ceafeb25c44c8884412794", "finality": "FINALIZED", "result": "MAJORITY_DISAGREE", "state_change": false},
-    "ambiguity_rejection": {"tx": "0x414010d85c73d86636a8daa2ebbb59d122297b660074f150e032e305247e63c6", "finality": "FINALIZED", "result": "MAJORITY_DISAGREE", "state_change": false},
-    "consumer": {"perform_tx": "0xf3230bc4cafa8237f595667634cc9dda5251279ee343d225b087505e9b12ec9b", "performed": true, "replay_tx": "0x2ef4552024ab6748dd88b0aed337d7fdf68d0f1ab3ed10f94e521013b6ab189f", "replay_error": "ALREADY_PERFORMED"}
+    "create_agreement_tx": "0xb7dd01221408e3618f61ef349c5f7c199baf74f304234b545a8afaa844eb2b97",
+    "add_referrer_tx": "0x388e1f01a09dc0aeccb0fc75a79d85918ec6836381b1a59e1a4b69a5d2299903",
+    "attestation_txs": [
+      "0x33c1eaeb41fb04e9cd1a7dcf0b6ab25ee274335ada12f22bb83387482dda4a97",
+      "0x4abf499382717ca945029e04b63ba4639e36eaac077734dddd71e06029daa4c5",
+      "0x9597a89be572bc4f8c2b16bdff7f30889550075f0611491e159f481ed393f2da"
+    ],
+    "seal_tx": "0xc3ae91645560df207a738c03ae15e544cb5efee1043e544ebf1e51abd03a3a46",
+    "rejected_price_increase": {"tx": "0xfaf7657bc4a6a59f9ec154804a2efbd4abab3710f1a4c79ec01bf6277c529904", "receipt": "FINALIZED / MAJORITY_DISAGREE", "impact_vector": "WNB", "state_change": false},
+    "rejected_deadline_weakening": {"tx": "0xa05a222d1370b7db925b6a726b522287cdf01b71976900a8972af9534855b2d7", "receipt": "FINALIZED / MAJORITY_DISAGREE", "impact_vector": "BWN", "state_change": false},
+    "rejected_hidden_worsening": {"tx": "0xcad9ab02190bad7f418d22d56944bd7d60eca62bb2eeca60b773b18ac88910a2", "receipt": "FINALIZED / MAJORITY_DISAGREE", "impact_vector": "NNW", "state_change": false},
+    "rejected_nonconvergent_candidate": {"tx": "0xa506f0e2d0bf8ffa042712635a58eb4df1d6b279459a1f95291b4ac8abfb4350", "receipt": "FINALIZED / MAJORITY_DISAGREE", "state_change": false},
+    "neutral_proposal_1": {"id": 1, "tx": "0x60ca881b3639c9070f2efb0084d3f27fbcab0eeaa63179a04dbab60026a9be4b", "impact_vector": "NNN", "captured_approval_txs": ["0xa1d322667667d7be8c4948192a404e050700351e304f69df7cadc7b2d4350e5c"], "approval_mask_readback": 3, "finalize_tx": "0x8919828e33e8908b93be12b90a26e424959a761d59c55b3bfad55cea393fd513", "adopted_head": "c45f36a5bf2509c699810517caace828e8003e7c3529ff19e78d76b546f5cf8c"},
+    "neutral_proposal_2": {"id": 2, "tx": "0xef12d4be231fba13d7167704c8681af3b26afdc29229c7cc701d3da3cd3b7caf", "impact_vector": "NNN", "approval_txs": ["0xfc4973a4266f00fc3643da1472fbb58c33e96b34d94d50a1dcc8903238402912", "0xf264271b80481d5825804b253b5e74e08f4abe91910eaf4260976bada2112f55"], "finalize_tx": "0x5bcb84001807d3661f67eafdb0916090aa45be684113a37f6e58d3d1a8d696d7", "adopted_head": "416b1751429f20d20e5c3c3edb6c884dd5fd36e5ff287fd51e4f6a643d5c8138"},
+    "same_party_quota_rejection": {"tx": "0x77700b82fecaae07032752511ebd87e5f0c76f977eb6e40922487160943bc16d", "receipt": "FINALIZED", "execution": "ERROR / PROPOSAL_QUOTA", "state_change": false},
+    "other_party_proposal": {"id": 3, "tx": "0xc29237a673e44c0fd88437a579fb9cf80b2edd346f26ec06378a596d4911d99b", "receipt": "FINALIZED / MAJORITY_AGREE", "status": "PENDING against prior head"},
+    "stale_rejection": {"tx": "0x87cb079aabf866b835843727635baa94dae8211e2b5f0ed396639648398b5bf0", "receipt": "FINALIZED", "execution": "ERROR / STALE_PROPOSAL", "state_change": false},
+    "consumer_perform": {"tx": "0x6642b5173651e0a019e5705fa292d6b7ae1a24b553bc762c7896a4eb5ee0826c", "receipt": "FINALIZED / MAJORITY_AGREE / SUCCESS", "was_performed": true},
+    "consumer_replay": {"tx": "0xe9b0b4b7c88934e881d3a7e3655694aa1254e67e608d2879030700cb0c3de3d4", "receipt": "FINALIZED / MAJORITY_AGREE", "execution": "ROLLBACK / ALREADY_PERFORMED", "was_performed_after": true}
   },
-  "limitations": ["The Supplier add-party hash was not retained by the CLI output and is intentionally omitted rather than guessed.", "The live fixture is repository-controlled evidence, not independent commercial-market proof.", "Leader rationale and witness are LEADER_REPORTED_NOT_CERTIFIED; the impact vector is the decision-bearing output."]
+  "tests": {
+    "offline": "36/36 passed",
+    "official_direct_mode": "14/14 passed",
+    "mutation": "10/10 killed",
+    "lint": "3/3 per contract",
+    "semantic_validation": "passed for both contracts",
+    "preflight": "passed",
+    "network_guard": "passed for chain 61999"
+  },
+  "limitations": [
+    "The impact vector is consensus-bound; leader reason and witness are LEADER_REPORTED_NOT_CERTIFIED.",
+    "Wallet attestation is not legal identity proof.",
+    "The live text fixture is repository-controlled evidence, not independent commercial-market evidence.",
+    "The consumer is a one-shot authorization example and holds no funds."
+  ]
 }

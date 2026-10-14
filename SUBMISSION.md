@@ -1,36 +1,52 @@
 # ParetoRail submission evidence
 
-ParetoRail is a contract-only GenLayer primitive for consent-safe amendments to multi-party natural-language agreements. It uses consensus for a bounded per-party semantic impact vector and deterministic contract logic for quorum, harmed-party consent, exact proposal binding, stale-head rejection and hash-linked history. Ordinary deterministic code cannot itself classify the material effect of a free-form amendment on each party; consensus is used only for that bounded semantic relation, not for votes, thresholds, hashes, identity or adoption.
+ParetoRail is a contract-only GenLayer primitive for consent-safe amendments to multi-party natural-language agreements. Consensus is used only for a bounded per-party semantic impact vector; deterministic contract logic enforces exact text/head binding, quorum, harmed-party consent, replay protection, stale-head rejection and hash-linked history. Ordinary deterministic code cannot reliably classify the material effect of a free-form amendment on each party, while consensus alone must not decide votes, thresholds, identity or adoption.
 
-## Verified target
+## Current verified target
 
 - Network: stable StudioNet `studionet`, chain `61999` (`0xF22F`)
 - RPC: `https://studio.genlayer.com/api`
 - Repository-local CLI: `genlayer@0.39.1`
-- ParetoRail: `0x3cF4773bAC377CeaA3f90b5AE3bC1E317F315411`
-- Deployment transaction: `0xf054cc46ea3677d9aa5aa5012f1393fc644bc871beb96252ccd72a4472db13cd`
-- Deployed source commit: `380e81b08518ea57be66fdc6c64d693c8e011cd6`
-- Deployment outcome: `FINALIZED / MAJORITY_AGREE / SUCCESS`
-- ParetoRail source SHA-256: `f19d28c009259ddf22c289936beb43b7d7c064dcaa83f69e7049ff314580215d`
-- Deployed-source parity: exact byte count and SHA-256 match (`23,686` bytes)
+- Corrected ParetoRail: `0x45df5A40bf702306bd9A30Ae5Bec1847C2e6efE1`
+- ParetoRail deployment transaction: `0xec1809fb315effc9b7a37212fe508a2f005a0a16479e42bcfd6efb455f9f270d`
+- ParetoRail deployment outcome: `FINALIZED / MAJORITY_AGREE / SUCCESS`
+- Deployed ParetoRail source commit: `83a2dbb53e247e54aa73f3224c174dcf6b1625f5`
+- ParetoRail source: `26,200` bytes, SHA-256 `f96cd5dc10d5ddbdfad3d573b50eb2533cda8d82c88695a47d6480b2199f0a32`
+- ParetoRail source parity: exact `gen_getContractCode` byte and SHA-256 match
+- Corrected Consumer: `0xAA543bF4395A87A744fc4b5813BA6cc8960C18AE`
+- Consumer deployment transaction: `0x3a0948c43ff77efe22d3c57af30254f6b48604b76f28346a49f04fdb12e99a24`
+- Consumer deployment outcome: `FINALIZED / MAJORITY_AGREE / SUCCESS`
+- Consumer binding: ParetoRail above, proposal `2`, adopted head `416b1751429f20d20e5c3c3edb6c884dd5fd36e5ff287fd51e4f6a643d5c8138`
+- Consumer source: `1,210` bytes, SHA-256 `2044110f4e6c20ade3335eabaf1765be71738440713ac6f81b6773fe4dc55c7c`, exact deployed parity
+- Source-code CI: [38605324552](https://github.com/ometere123/paretorail/actions/runs/38605324552), green for the deployed source commit
 
-The optional `AmendedActionGate` consumer is deployed at `0xd3b91F93ECE55c188D2E8938A37cF35ded583f39`, bound to the ParetoRail address above, proposal `4`, and adopted head `cda68fa595c6064411be0eed3b0a888a5872551c8ac4d9f1418807061e402cdd`. Its source SHA-256 is `2044110f4e6c20ade3335eabaf1765be71738440713ac6f81b6773fe4dc55c7c`; deployed bytes match.
+The superseded deployment is historical only and is preserved in [docs/HISTORY.md](docs/HISTORY.md) and `artifacts/studionet_proof_historical_690b6e.json`.
 
-## Tests and tooling
+## Test and tool evidence
 
-- Offline mock-runtime suite: `33 passed` (`python -m pytest tests/test_offline.py -q`). These are explicitly not Direct Mode or live evidence.
-- Official Direct Mode suite: `11 passed` (`py -3.12 -m pytest tests/direct/ -v`).
-- GenVM lint: `3/3` checks passed for `contracts/paretorail.py`; `3/3` checks passed for `contracts/consumer_example.py`; `genvm-lint download --version v0.2.12` completed.
-- Structural preflight: passed.
-- Stable network guard: passed for local CLI `0.39.1`, studionet and RPC; RPC `eth_chainId` returned `0xf22f`.
-- Python 3.12 was used for the pinned GenLayer test/lint toolchain. `npm install --no-audit --no-fund` generated the committed lockfile.
+- Offline mock-runtime tests: **36/36 passed**. These are not Direct Mode or live consensus evidence.
+- Official GenLayer Direct Mode tests: **14/14 passed** with pinned GenVM `v0.2.12`.
+- Behavioral security mutation suite: **10/10 mutants killed**.
+- GenVM lint: **3/3** checks passed for each deployable contract.
+- GenVM semantic validation: passed for both deployable contracts.
+- Python 3.12 syntax and structural preflight: passed.
+- Stable network guard: passed; RPC `eth_chainId` returned `0xf22f`.
 
-## Live lifecycle summary
+## Live state and lifecycle evidence
 
-The final deployment has a finalized three-party agreement with unanimous baseline attestations, a `BWN` amendment that could not finalize at quorum until the harmed Supplier consented, and a subsequent finalized adoption. A semantically equivalent reordered amendment was certified `NNN` and adopted. Old-head finalization returned `STALE_PROPOSAL`. A hidden referral carve-out and an ambiguous/non-convergent attempt finalized without state change (`MAJORITY_DISAGREE`). The bound consumer performed exactly once and rejected replay with `ALREADY_PERFORMED`.
+The corrected deployment has a finalized three-party agreement `1`, with Buyer `0x951e6B75530774fF82321a5ae54e14F778F0C855`, Supplier `0xB845a69860ba4CDf19CfDC5AfbAF2e20b6bE86b0`, and Referrer `0xac3AC69dC0Bde389256dD6748C75817ead9286D9`. All three individually attested the final roster; sealing finalized with genesis `696cf2dfc942eab28678d6a961e0c0b881174d8e72ccf9978333ff3c5849e5b0`.
 
-Detailed hashes and state readbacks are in [DEPLOYMENT.md](DEPLOYMENT.md) and the machine-readable [artifacts/studionet_proof.json](artifacts/studionet_proof.json).
+The live run also proves:
 
-## Scope and limitations
+- consensus rejected a buyer-price increase (`0xfaf7657bc4a6a59f9ec154804a2efbd4abab3710f1a4c79ec01bf6277c529904`) and a deadline weakening (`0xa05a222d1370b7db925b6a726b522287cdf01b71976900a8972af9534855b2d7`) without persisting proposals;
+- a neutral candidate was accepted as proposal `1`, approved by the relevant parties, and adopted at head `c45f36a5bf2509c699810517caace828e8003e7c3529ff19e78d76b546f5cf8c`;
+- a second neutral cosmetic candidate was adopted as proposal `2`, producing final version `3` and head `416b1751429f20d20e5c3c3edb6c884dd5fd36e5ff287fd51e4f6a643d5c8138`;
+- a same-party second submission was rejected with `PROPOSAL_QUOTA` (`0x77700b82fecaae07032752511ebd87e5f0c76f977eb6e40922487160943bc16d`), while another party still submitted proposal `3` (`0xc29237a673e44c0fd88437a579fb9cf80b2edd346f26ec06378a596d4911d99`);
+- the competing proposal was stale after the head advanced; the finalized approval attempt `0x87cb079aabf866b835843727635baa94dae8211e2b5f0ed396639648398b5bf0` returned `STALE_PROPOSAL` without state mutation;
+- the corrected Consumer performed once in `0x6642b5173651e0a019e5705fa292d6b7ae1a24b553bc762c7896a4eb5ee0826c`, read back `true`, and rejected replay in `0xe9b0b4b7c88934e881d3a7e3655694aa1254e67e608d2879030700cb0c3de3d4` with `ALREADY_PERFORMED`.
 
-ParetoRail does not prove legal fairness, domain ownership, complete discovery of external obligations, or commercial-market adoption. A party wallet is the contract’s identity boundary. Leader explanations are stored as `LEADER_REPORTED_NOT_CERTIFIED`; only the normalized impact vector is consensus-bound. The example consumer gates a one-shot action and does not custody or transfer GEN.
+Full transaction/state detail is in [DEPLOYMENT.md](DEPLOYMENT.md), and machine-readable evidence is in [artifacts/studionet_proof.json](artifacts/studionet_proof.json).
+
+## Trust boundaries and limitations
+
+The impact vector is the consensus-bound decision-bearing output. Leader explanation and witness text are stored with `LEADER_REPORTED_NOT_CERTIFIED` provenance and are not presented as independently agreed facts. The model-mediated comparison is not a formal legal or mathematical proof. Party-wallet attestation is not legal identity verification. The controlled live fixture demonstrates the contract mechanics, not independent market discovery or commercial enforcement. The example consumer authorizes one head-pinned, one-shot action and holds no funds.
