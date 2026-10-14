@@ -25,6 +25,8 @@ jobs:
         run: genvm-lint check contracts/consumer_example.py
       - name: Direct Mode
         run: python -m pytest tests/direct -v
+      - name: Security mutation suite
+        run: python -m pytest tests/mutation -q
   cli:
     runs-on: ubuntu-latest
     steps:

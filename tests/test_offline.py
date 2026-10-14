@@ -2,13 +2,17 @@
 import copy
 import hashlib
 import importlib.util
+import os
 import sys
 import types
 from pathlib import Path
 
 import pytest
 
-SOURCE = Path(__file__).resolve().parents[1] / 'contracts' / 'paretorail.py'
+SOURCE = Path(os.environ.get(
+    'PARETORAIL_TEST_SOURCE',
+    str(Path(__file__).resolve().parents[1] / 'contracts' / 'paretorail.py'),
+))
 
 
 class Array(list):
@@ -32,6 +36,7 @@ class Map(dict):
             if self.typ.__name__ == 'Agreement':
                 entry.party_ids = Array()
                 entry.proposal_ids = Array()
+                entry.head_proposal_counts = Array()
             self[key] = entry
         return self[key]
 
@@ -346,6 +351,7 @@ def test_conflicting_proposals_head_invalidation(core):
     aid, head = setup(core)
     gl.nondet.leader = verdict('NNN')
     p1 = c.propose_amendment(aid, NEUTRAL, head)
+    actor(gl, B)
     p2 = c.propose_amendment(aid, NEW, head)
     for who in (A, B):
         actor(gl, who); c.approve(p1)
@@ -355,6 +361,64 @@ def test_conflicting_proposals_head_invalidation(core):
         c.approve(p2)
     with pytest.raises(ValueError, match='STALE_HEAD'):
         c.propose_amendment(aid, BASE, head)
+
+
+def test_per_party_head_quota_preserves_other_parties_and_resets_after_adoption(core):
+    _, c, gl = core
+    aid, head = setup(core)
+    gl.nondet.leader = verdict('NNN')
+    first = c.propose_amendment(aid, 'Buyer pays 50 GEN. Bob delivers in six days. Carol receives ten percent.', head)
+
+    actor(gl, A)
+    with pytest.raises(ValueError, match='PROPOSAL_QUOTA'):
+        c.propose_amendment(aid, 'Buyer pays 50 GEN. Bob delivers in seven days. Carol receives ten percent.', head)
+
+    # The first proposer cannot monopolize another party's independent slot.
+    actor(gl, B)
+    second = c.propose_amendment(aid, 'Buyer pays 50 GEN. Bob delivers in nine days. Carol receives ten percent.', head)
+    assert second != first
+
+    # Adoption advances the head and resets every party's head-scoped slot.
+    actor(gl, A); c.approve(first)
+    actor(gl, B); c.approve(first)
+    new_head = c.finalize_amendment(first)
+    with pytest.raises(ValueError, match='STALE_PROPOSAL'):
+        c.approve(second)
+    actor(gl, A)
+    third = c.propose_amendment(aid, 'Buyer pays 50 GEN. Bob delivers in ten days. Carol receives ten percent.', new_head)
+    assert third > second
+
+
+def test_cancelled_proposal_consumes_only_proposer_slot(core):
+    _, c, gl = core
+    aid, head = setup(core)
+    gl.nondet.leader = verdict('NNN')
+    first = c.propose_amendment(aid, 'Buyer pays 50 GEN. Bob delivers in six days. Carol receives ten percent.', head)
+    actor(gl, A)
+    c.cancel_proposal(first)
+    with pytest.raises(ValueError, match='PROPOSAL_QUOTA'):
+        c.propose_amendment(aid, 'Buyer pays 50 GEN. Bob delivers in seven days. Carol receives ten percent.', head)
+    actor(gl, B)
+    second = c.propose_amendment(aid, 'Buyer pays 50 GEN. Bob delivers in nine days. Carol receives ten percent.', head)
+    assert second != first
+
+
+def test_proposal_history_is_bounded_and_paginated(core):
+    _, c, _ = core
+    aid, _ = setup(core)
+    agreement = c.agreements[aid]
+    for proposal_id in range(1, 32):
+        agreement.proposal_ids.append(Int(proposal_id))
+
+    summary = c.get_agreement(aid)
+    assert summary['proposal_count'] == 31
+    assert summary['proposal_ids'] == list(range(7, 32))
+    assert summary['proposal_ids_offset'] == 6
+    assert summary['proposal_ids_truncated'] is True
+    assert c.get_proposal_ids_page(aid, Int(0), Int(10)) == list(range(1, 11))
+    assert c.get_proposal_ids_page(aid, Int(25), Int(25)) == list(range(26, 32))
+    with pytest.raises(ValueError, match='PAGE_LIMIT'):
+        c.get_proposal_ids_page(aid, Int(0), Int(26))
 
 
 def test_adoption_is_one_shot(core):

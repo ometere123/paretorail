@@ -32,7 +32,7 @@ def main():
     check(isinstance(tree, ast.Module) and len(tree.body) > 5, 'Python AST parse succeeded')
     check(all(name in funcs for name in ('create_agreement','add_party','attest_initial',
         'seal_agreement','propose_amendment','approve','withdraw_approval','finalize_amendment',
-        'get_agreement','get_proposal','matches_head','is_adopted')), 'complete contract API')
+        'get_agreement','get_proposal','get_proposal_ids_page','matches_head','is_adopted')), 'complete contract API')
     check(not any((ROOT/x).exists() for x in ('frontend','backend','app','pages')), 'contract-only package')
     check(not any(x in src for x in ('0.40.0rc','studio-dev.genlayer.com','61997')), 'contract has no preview-network references')
     print('SHA256 '+hashlib.sha256(src.encode()).hexdigest())

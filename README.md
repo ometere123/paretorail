@@ -44,6 +44,7 @@ Consensus binds the material **impact vector**, not the witness prose. Reasons a
 3. Every party, including creator, calls `attest_initial(agreement_id)` **after the final roster is set**. Any later addition increments roster revision and invalidates all earlier attestations.
 4. `seal_agreement(agreement_id)` is permitted only after unanimous attestation. It fixes the party set, roles, policy purpose, quorum, genesis and initial head.
 5. Any party calls `propose_amendment(agreement_id, new_terms, expected_head_hash)`. Every proposal freezes the old head, full old/new texts, exact vote/impact vector and a hash of the semantic assessment.
+   Each party has one independent submission opportunity per sealed head. A blocked or cancelled proposal consumes only that proposer's slot; adoption resets all party slots for the new head.
 6. All approval calls are explicit on-chain, one wallet per roster index: `approve(proposal_id)` and `withdraw_approval(proposal_id)`.
 7. `finalize_amendment(proposal_id)` succeeds only when minimum quorum **AND every harmed party's explicit approval** are present. Its caller cannot override those rules. No unapproved party votes by proxy.
 8. The operative head increments and is hash-linked to genesis, predecessor, proposal and consensus receipt. Other proposals from the previous head go stale; no hidden rebasing.
@@ -68,6 +69,7 @@ No unilateral privileged override, admin mutation of a sealed agreement, or back
 |---|---|
 | `get_agreement(id)` | Purpose, roster, attestations, terms, genesis, head, version. |
 | `get_proposal(id)` | Impact vector, harmed/approval masks, evidence, receipts, state. |
+| `get_proposal_ids_page(id, offset, limit)` | Bounded historical proposal-ID pagination; `limit` is at most 25. |
 | `can_finalize(id)` | Current deterministic approval predicate. |
 | `current_head(id)` | Current head or empty. |
 | `matches_head(id, hash)` | Exact current-head consumer gate. |
@@ -110,7 +112,7 @@ python -m pytest tests/direct/ -v
 genvm-lint check contracts/paretorail.py
 ```
 
-The current verified run reports **33/33 offline mock-runtime tests**, **11/11 official Direct Mode tests**, and **3/3 GenVM lint checks for each deployable contract**. The local CLI is `genlayer@0.39.1`; the network guards verify stable StudioNet `61999` at `https://studio.genlayer.com/api`.
+The current verified run reports **36/36 offline mock-runtime tests**, **14/14 official Direct Mode tests**, **10/10 behavioral security mutations killed**, and **3/3 GenVM lint checks for each deployable contract**. The local CLI is `genlayer@0.39.1`; the network guards verify stable StudioNet `61999` at `https://studio.genlayer.com/api`.
 
 The final ParetoRail deployment used for the live evidence is `0x3cF4773bAC377CeaA3f90b5AE3bC1E317F315411`. Its deployment transaction is `0xf054cc46ea3677d9aa5aa5012f1393fc644bc871beb96252ccd72a4472db13cd`, finalized with `MAJORITY_AGREE` and successful execution. The committed source SHA-256 is `f19d28c009259ddf22c289936beb43b7d7c064dcaa83f69e7049ff314580215d`, and `gen_getContractCode` returned the same 23,686 bytes and digest.
 
@@ -118,7 +120,8 @@ The optional head-pinned consumer was also deployed as `AmendedActionGate` at `0
 
 ## Boundaries / safety
 
-- Up to **6 parties** and **40 proposals per agreement**; entire text bounded to 3,500 chars per version.
+- Up to **6 parties** and one proposal opportunity per party per sealed head; historical proposal IDs remain append-only and are exposed through bounded pages of at most 25. Entire text is bounded to 3,500 chars per version.
+- A party cannot refill its head slot through trivial wording changes. Blocked and cancelled proposals consume only that party's current-head slot; an adopted head resets all party slots, while old proposals remain immutable and directly addressable.
 - Every party explicitly attests initial roster and agreement; creator alone cannot invent their consent.
 - Proposals pin both old head/version and new text/consensus receipt.
 - Quorum never substitutes for a harmed party's explicit approval.

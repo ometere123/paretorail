@@ -19,6 +19,21 @@ The exact agreed input is a tuple of the sealed `purpose`, ordered `[(wallet, ro
 
 On finalisation, the new head incorporates genesis, predecessor, proposal id, frozen semantic-receipt hash, candidate text hash and version. Once the head moves, competing proposals become stale even if they had gathered sufficient consent earlier. Historical proposal record remains intact.
 
+## Proposal liveness and history
+
+Submission capacity is scoped to the current sealed head rather than to a
+permanent agreement-wide lifetime counter. Each registered party has one
+proposal opportunity per head. A blocked or cancelled proposal consumes only
+the submitting party's opportunity, so one participant cannot exhaust the
+other parties' capacity. Adoption resets all party opportunities for the new
+head; old-head proposals become stale and cannot consume new-head capacity.
+
+Proposal records are append-only and retain globally unique IDs. Because
+history can outlive a single fixed lifetime cap, `get_agreement()` exposes a
+bounded recent proposal window and `get_proposal_ids_page()` provides
+bounded historical enumeration (`limit <= 25`); individual old proposals
+remain directly readable with `get_proposal()`.
+
 ## Security intuition and limits
 
 Even multiple independent LLMs can share blind spots. This protocol is *not* formal semantic proof or legal determination. It is an auditable conservative voting mechanism that raises the bar for adverse changes. The protocol cannot bind an unregistered third party and cannot certify outcomes beyond material changes visible in the supplied old/new texts.

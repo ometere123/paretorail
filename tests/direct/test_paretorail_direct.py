@@ -186,3 +186,87 @@ def test_direct_truncated_impact_vector_fails_closed(direct_vm, direct_deploy, d
     assert c.get_proposal(pid)['impact_vector'] == 'UUU'
     assert c.get_proposal(pid)['status'] == 2
     assert not c.can_finalize(pid)
+
+
+def test_direct_per_party_head_quota_and_stale_reset(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie):
+    """One party cannot consume another party's head-scoped submission slot."""
+    c, aid, head = _setup(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie)
+    _mock(direct_vm, 'NNN')
+    first = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within six days. Referrer receives ten percent.',
+        head,
+    )
+    direct_vm.sender = direct_alice
+    with direct_vm.expect_revert('PROPOSAL_QUOTA'):
+        c.propose_amendment(
+            aid,
+            'Buyer pays 50 GEN. Supplier delivers within seven days. Referrer receives ten percent.',
+            head,
+        )
+
+    # Supplier still has its own opportunity on the same head.
+    direct_vm.sender = direct_bob
+    second = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within nine days. Referrer receives ten percent.',
+        head,
+    )
+    direct_vm.sender = direct_alice; c.approve(first)
+    direct_vm.sender = direct_bob; c.approve(first)
+    new_head = c.finalize_amendment(first)
+
+    # The competing old-head proposal cannot consume the new-head quota.
+    with direct_vm.expect_revert('STALE_PROPOSAL'):
+        c.approve(second)
+    direct_vm.sender = direct_alice
+    third = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within ten days. Referrer receives ten percent.',
+        new_head,
+    )
+    assert third > second
+
+
+def test_direct_cancelled_proposal_does_not_consume_other_party_quota(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie):
+    c, aid, head = _setup(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie)
+    _mock(direct_vm, 'NNN')
+    first = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within six days. Referrer receives ten percent.',
+        head,
+    )
+    direct_vm.sender = direct_alice
+    c.cancel_proposal(first)
+    with direct_vm.expect_revert('PROPOSAL_QUOTA'):
+        c.propose_amendment(
+            aid,
+            'Buyer pays 50 GEN. Supplier delivers within seven days. Referrer receives ten percent.',
+            head,
+        )
+    direct_vm.sender = direct_bob
+    second = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within nine days. Referrer receives ten percent.',
+        head,
+    )
+    assert second > first
+
+
+def test_direct_adversarial_audit_cannot_report_non_positive_party(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie):
+    """An audit index is meaningful only for a proposed N/B party."""
+    c, aid, head = _setup(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie)
+    _mock(direct_vm, 'WNN')
+    c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within six days. Referrer receives ten percent.',
+        head,
+    )
+    direct_vm.clear_mocks()
+    direct_vm.mock_llm(r'PARETORAIL / INDEPENDENT VALIDATOR', json.dumps({
+        'impacts':['W','N','N'], 'reason_code':'VALIDATED', 'witness':'Supplier and referrer unchanged',
+    }))
+    direct_vm.mock_llm(r'PARETORAIL / INDEPENDENT ADVERSARIAL', json.dumps({
+        'missed_worsening_indices':[0], 'uncertain':False,
+    }))
+    assert direct_vm.run_validator() is False

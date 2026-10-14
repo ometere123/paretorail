@@ -14,7 +14,11 @@ MAX_TERMS = 3500
 MAX_ROLE = 120
 MAX_REASON = 80
 MAX_WITNESS = 300
-MAX_PROPOSALS = 40
+# Each roster party gets one independent proposal opportunity per sealed head.
+# A blocked/cancelled proposal consumes only its proposer's opportunity; the
+# other parties retain theirs.  Opportunities reset only after adoption.
+MAX_PROPOSALS_PER_PARTY_PER_HEAD = 1
+MAX_PROPOSAL_PAGE = 25
 
 IMPACT_NEUTRAL = 'N'
 IMPACT_BETTER = 'B'
@@ -151,6 +155,7 @@ class Agreement:
     head_hash: str
     party_ids: DynArray[u256]
     proposal_ids: DynArray[u256]
+    head_proposal_counts: DynArray[u8]
 
 
 @allow_storage
@@ -188,6 +193,7 @@ class IParetoRail:
     class View:
         def get_agreement(self, agreement_id: u256) -> dict: ...
         def get_proposal(self, proposal_id: u256) -> dict: ...
+        def get_proposal_ids_page(self, agreement_id: u256, offset: u256, limit: u8) -> list: ...
         def can_finalize(self, proposal_id: u256) -> bool: ...
         def matches_head(self, agreement_id: u256, expected_head: str) -> bool: ...
         def is_adopted(self, proposal_id: u256, expected_head: str) -> bool: ...
@@ -291,7 +297,13 @@ class ParetoRail(gl.Contract):
                         return False
                     if len(set(missed)) != len(missed):
                         return False
-                    if any(proposed['vector'][x] in 'NB' for x in missed):
+                    # Every reported index must refer to a party the proposed
+                    # vector called N/B. Reporting a W/U party is not a
+                    # meaningful "missed" finding and must fail closed. A
+                    # valid missed finding also rejects the positive result.
+                    if any(proposed['vector'][x] not in 'NB' for x in missed):
+                        return False
+                    if missed:
                         return False
                 return True
             except Exception:
@@ -327,6 +339,7 @@ class ParetoRail(gl.Contract):
         p.role = creator_role
         p.attested_revision = u32(0)
         a.party_ids.append(pid)
+        a.head_proposal_counts.append(u8(0))
         return aid
 
     @gl.public.write
@@ -352,6 +365,7 @@ class ParetoRail(gl.Contract):
         p.role = role
         p.attested_revision = u32(0)
         a.party_ids.append(pid)
+        a.head_proposal_counts.append(u8(0))
         a.roster_revision = u32(int(a.roster_revision) + 1)
         return pid
 
@@ -389,14 +403,14 @@ class ParetoRail(gl.Contract):
         a = self._agreement(agreement_id)
         if not a.sealed:
             raise gl.vm.UserError('NOT_SEALED')
-        self._participant(a, gl.message.sender_address)
+        party_index = self._participant(a, gl.message.sender_address)
         new_terms = _required(new_terms, MAX_TERMS, 'BAD_TERMS')
         if expected_head_hash != str(a.head_hash):
             raise gl.vm.UserError('STALE_HEAD')
         if _hash(new_terms) == _hash(str(a.current_terms)):
             raise gl.vm.UserError('UNCHANGED_TERMS')
-        if len(a.proposal_ids) >= MAX_PROPOSALS:
-            raise gl.vm.UserError('PROPOSAL_LIMIT')
+        if int(a.head_proposal_counts[party_index]) >= MAX_PROPOSALS_PER_PARTY_PER_HEAD:
+            raise gl.vm.UserError('PROPOSAL_QUOTA')
         original_head = str(a.head_hash)
         assessment = self._consensus(a, str(a.current_terms), new_terms)
         count = len(a.party_ids)
@@ -428,8 +442,14 @@ class ParetoRail(gl.Contract):
             'base_head':original_head,'candidate_hash':str(p.new_terms_hash),
             'roster_hash':str(a.genesis_hash),'impact_vector':str(p.impact_vector)}))
         a.proposal_ids.append(prop_id)
+        a.head_proposal_counts[party_index] = u8(int(a.head_proposal_counts[party_index]) + 1)
         AmendmentProposed(prop_id, agreement_id, p.status, vector=str(p.impact_vector)).emit()
         return prop_id
+
+    def _reset_head_proposal_counts(self, a: Agreement) -> None:
+        # MAX_PARTIES bounds this loop independently of proposal history.
+        for i in range(len(a.head_proposal_counts)):
+            a.head_proposal_counts[i] = u8(0)
 
     def _live(self, p: Proposal, a: Agreement) -> None:
         if int(p.status) != STATUS_PENDING:
@@ -500,6 +520,7 @@ class ParetoRail(gl.Contract):
         a.current_terms = p.new_terms
         a.head_hash = next_head
         a.version = u32(new_version)
+        self._reset_head_proposal_counts(a)
         p.status = u8(STATUS_ADOPTED)
         p.adoption_head_hash = next_head
         AmendmentAdopted(proposal_id, p.agreement_id, a.version, head_hash=next_head).emit()
@@ -508,16 +529,46 @@ class ParetoRail(gl.Contract):
     @gl.public.view
     def get_agreement(self, agreement_id: u256) -> dict:
         a = self._agreement(agreement_id)
+        total_proposals = len(a.proposal_ids)
+        recent_offset = total_proposals - MAX_PROPOSAL_PAGE
+        if recent_offset < 0:
+            recent_offset = 0
+        recent_proposals = []
+        for i in range(recent_offset, total_proposals):
+            recent_proposals.append(int(a.proposal_ids[i]))
         return {'id':int(agreement_id),'creator':str(a.creator),'purpose':str(a.purpose),
             'baseline_terms':str(a.baseline_terms),'current_terms':str(a.current_terms),
             'sealed':bool(a.sealed),'quorum':int(a.quorum),'version':int(a.version),
             'genesis_hash':str(a.genesis_hash),'head_hash':str(a.head_hash),
             'roster_revision':int(a.roster_revision),
             'parties':[{'wallet':str(self.parties[p_id].wallet),
-                        'role':str(self.parties[p_id].role),
+                       'role':str(self.parties[p_id].role),
                         'attested':int(self.parties[p_id].attested_revision)==int(a.roster_revision)}
                        for p_id in a.party_ids],
-            'proposal_ids':[int(p_id) for p_id in a.proposal_ids]}
+            # Compatibility key retained as a bounded recent window. Use
+            # get_proposal_ids_page() for complete immutable history.
+            'proposal_ids':recent_proposals,
+            'proposal_ids_offset':recent_offset,
+            'proposal_count':total_proposals,
+            'proposal_ids_truncated':total_proposals > len(recent_proposals)}
+
+    @gl.public.view
+    def get_proposal_ids_page(self, agreement_id: u256, offset: u256, limit: u8) -> list:
+        a = self._agreement(agreement_id)
+        requested = int(limit)
+        if requested > MAX_PROPOSAL_PAGE:
+            raise gl.vm.UserError('PAGE_LIMIT')
+        start = int(offset)
+        total = len(a.proposal_ids)
+        if start >= total or requested == 0:
+            return []
+        end = start + requested
+        if end > total:
+            end = total
+        page = []
+        for i in range(start, end):
+            page.append(int(a.proposal_ids[i]))
+        return page
 
     @gl.public.view
     def get_proposal(self, proposal_id: u256) -> dict:
