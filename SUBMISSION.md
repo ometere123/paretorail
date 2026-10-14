@@ -7,26 +7,26 @@ ParetoRail is a contract-only GenLayer primitive for consent-safe amendments to 
 - Network: stable StudioNet `studionet`, chain `61999` (`0xF22F`)
 - RPC: `https://studio.genlayer.com/api`
 - Repository-local CLI: `genlayer@0.39.1`
-- Corrected ParetoRail: `0x45df5A40bf702306bd9A30Ae5Bec1847C2e6efE1`
-- ParetoRail deployment transaction: `0xec1809fb315effc9b7a37212fe508a2f005a0a16479e42bcfd6efb455f9f270d`
+- Final ParetoRail: `0x7a785f8790c44A470898D24772773E1A2713b15D`
+- ParetoRail deployment transaction: `0x6c713238330a8252bd2858cc2c28863ef66c983e617abe81b5279c77f6c75a26`
 - ParetoRail deployment outcome: `FINALIZED / MAJORITY_AGREE / SUCCESS`
-- Deployed ParetoRail source commit: `83a2dbb53e247e54aa73f3224c174dcf6b1625f5`
-- ParetoRail source: `26,200` bytes, SHA-256 `f96cd5dc10d5ddbdfad3d573b50eb2533cda8d82c88695a47d6480b2199f0a32`
+- Deployed ParetoRail source commit: `296eb2d77f2489379aa1f5cdc8c208b6b0f6f539`
+- ParetoRail source: `26,993` bytes, SHA-256 `fcda440704141cfca09fdf7db0bb0d29d538dc5aff9081ae0242adf20172247e`
 - ParetoRail source parity: exact `gen_getContractCode` byte and SHA-256 match
-- Corrected Consumer: `0xAA543bF4395A87A744fc4b5813BA6cc8960C18AE`
-- Consumer deployment transaction: `0x3a0948c43ff77efe22d3c57af30254f6b48604b76f28346a49f04fdb12e99a24`
+- Final Consumer: `0x522984057CA9181417f8E97023EA6a02f9AA5121`
+- Consumer deployment transaction: `0x4e3d1ee0164f2419a17838ee615191575c7807f07a73203bd706d0446d4a2a01`
 - Consumer deployment outcome: `FINALIZED / MAJORITY_AGREE / SUCCESS`
-- Consumer binding: ParetoRail above, proposal `2`, adopted head `416b1751429f20d20e5c3c3edb6c884dd5fd36e5ff287fd51e4f6a643d5c8138`
+- Consumer binding: ParetoRail above, proposal `5`, adopted head `970ff648c7f9096b8acb5fb8ae3f900b85536768ab6de4899c9fede4b557ee46`
 - Consumer source: `1,210` bytes, SHA-256 `2044110f4e6c20ade3335eabaf1765be71738440713ac6f81b6773fe4dc55c7c`, exact deployed parity
-- Source-code CI: [38605324552](https://github.com/ometere123/paretorail/actions/runs/38605324552), green for the deployed source commit
+- Final CI run: to be recorded after this final evidence commit is pushed; the deployed contract source was tested and deployed from `296eb2d`
 
-The superseded deployment is historical only and is preserved in [docs/HISTORY.md](docs/HISTORY.md) and `artifacts/studionet_proof_historical_690b6e.json`.
+The prior corrected deployment (`0x45df5A40bf702306bd9A30Ae5Bec1847C2e6efE1`) is historical only and is preserved in [docs/HISTORY.md](docs/HISTORY.md) and [artifacts/studionet_proof_historical_06ed.json](artifacts/studionet_proof_historical_06ed.json).
 
 ## Test and tool evidence
 
-- Offline mock-runtime tests: **36/36 passed**. These are not Direct Mode or live consensus evidence.
-- Official GenLayer Direct Mode tests: **14/14 passed** with pinned GenVM `v0.2.12`.
-- Behavioral security mutation suite: **10/10 mutants killed**.
+- Offline mock-runtime tests: **40/40 passed**. These are not Direct Mode or live consensus evidence.
+- Official GenLayer Direct Mode tests: **16/16 passed** with pinned GenVM `v0.2.12`.
+- Behavioral security mutation suite: **13/13 mutants killed**.
 - GenVM lint: **3/3** checks passed for each deployable contract.
 - GenVM semantic validation: passed for both deployable contracts.
 - Python 3.12 syntax and structural preflight: passed.
@@ -34,19 +34,21 @@ The superseded deployment is historical only and is preserved in [docs/HISTORY.m
 
 ## Live state and lifecycle evidence
 
-The corrected deployment has a finalized three-party agreement `1`, with Buyer `0x951e6B75530774fF82321a5ae54e14F778F0C855`, Supplier `0xB845a69860ba4CDf19CfDC5AfbAF2e20b6bE86b0`, and Referrer `0xac3AC69dC0Bde389256dD6748C75817ead9286D9`. All three individually attested the final roster; sealing finalized with genesis `696cf2dfc942eab28678d6a961e0c0b881174d8e72ccf9978333ff3c5849e5b0`.
+The final deployment has a finalized three-party agreement `1`, with Buyer `0x951e6B75530774fF82321a5ae54e14F778F0C855`, Supplier `0xB845a69860ba4CDf19CfDC5AfbAF2e20b6bE86b0`, and Referrer `0xac3AC69dC0Bde389256dD6748C75817ead9286D9`. All three individually attested the final roster. The final readback is sealed, version `3`, with genesis `0eb4e805cfe0f17987d26f32fe4dbe2f80d4fff784088244927ef5c2e1ecce34` and head `970ff648c7f9096b8acb5fb8ae3f900b85536768ab6de4899c9fede4b557ee46`.
 
-The live run also proves:
+The final run proves:
 
-- consensus rejected a buyer-price increase (`0xfaf7657bc4a6a59f9ec154804a2efbd4abab3710f1a4c79ec01bf6277c529904`) and a deadline weakening (`0xa05a222d1370b7db925b6a726b522287cdf01b71976900a8972af9534855b2d7`) without persisting proposals;
-- a neutral candidate was accepted as proposal `1`, approved by the relevant parties, and adopted at head `c45f36a5bf2509c699810517caace828e8003e7c3529ff19e78d76b546f5cf8c`;
-- a second neutral cosmetic candidate was adopted as proposal `2`, producing final version `3` and head `416b1751429f20d20e5c3c3edb6c884dd5fd36e5ff287fd51e4f6a643d5c8138`;
-- a same-party second submission was rejected with `PROPOSAL_QUOTA` (`0x77700b82fecaae07032752511ebd87e5f0c76f977eb6e40922487160943bc16d`), while another party still submitted proposal `3` (`0xc29237a673e44c0fd88437a579fb9cf80b2edd346f26ec06378a596d4911d99`);
-- the competing proposal was stale after the head advanced; the finalized approval attempt `0x87cb079aabf866b835843727635baa94dae8211e2b5f0ed396639648398b5bf0` returned `STALE_PROPOSAL` without state mutation;
-- the corrected Consumer performed once in `0x6642b5173651e0a019e5705fa292d6b7ae1a24b553bc762c7896a4eb5ee0826c`, read back `true`, and rejected replay in `0xe9b0b4b7c88934e881d3a7e3655694aa1254e67e608d2879030700cb0c3de3d4` with `ALREADY_PERFORMED`.
+- unauthorized roster mutation was finalized with leader execution `ERROR` in `0x76ac9ef14ff1e979e7aee907395f9328616aa7a512e436d4d6a6059256fa8452`; the roster remained unchanged;
+- proposals `1` and `2` were cancelled by their own proposers, then both parties independently submitted proposals `3` and `4` against the unchanged original head (`0x16d5cb9735e46543e2b5f08cd4c00c744d618c014f96922ec19436039f27c950` and `0x556b2f45d63a7b99e6ab6b9ace650dd7e6cbf9f29326797487b0c91c09d0c335`). This is the live recovery of the former all-participants-exhausted deadlock;
+- proposal `4` was approved by Supplier and Buyer (`0xf5564dae2d268bd4664b1a1d6b4059511fa0b069b19e44c237bc82c17a8c5fe7`, `0xd89378eb8c99c5169b91f379ab502aa5f7b1e686d34f4258af7df1ec028ae00d`) and adopted in `0x79151362ebf0bf4c81da90f42bf4993b485514d0d91bb6d7891e0e7fb17eccb2`, advancing to version `2` and head `13bf4307ea5512427e5770b72284f757763e9fe59fb5ef2ba5375b797e02be53`;
+- an approval against stale proposal `3` finalized with leader execution `ERROR` in `0xbfebc1a55adee5fd5436d2f8f04261586bfa714dbfcf49da0b330e1ee5b0a7a1` and did not mutate state;
+- proposal `5` produced the actual live adverse vector `NNW` with `impacted_mask=4`. Buyer and Supplier approvals alone yielded `approvals_mask=3` and `can_finalize=false` (`0xdbe4039e4e5afae0a59b2162164d4c082e0f216de7707d9545cae330ac27c`, `0xc2ebcd296afeec32a447a0365cc4dfaebf6a6674bbb6738915b529cc5cff2dd7`); Referrer then approved in `0xc242df147129542d4b0bf8b0da17b23c66bfd47c16566b0fe5a72d89cafb22be`, giving mask `7` and `can_finalize=true`;
+- proposal `5` finalized in `0x09086816f798cc4e462169710e7f850da5f7aa1b3dca35327edcb86c435ce7a0`, adopting the exact reduced-referral text and head above;
+- an intentionally vague candidate returned a conservative `WWW` vector and was cancelled in `0xa28b9f9c95461c5fff8dccfd5a10b77be021be8f0489c132feea268f006f71b6`; the official Direct Mode suite separately proves `U` proposals are terminal and recoverable;
+- the final Consumer was bound to proposal `5` and the final adopted head. Its one-shot `perform()` finalized successfully in `0x66315c086eb4126785412ace1d91ec7a9cfab2e3b342ee3ea443bfe67045e93e`; `was_performed()` read back `true`. Replay finalized in `0xe7c1072219051b0e3bb36901e37dbe725210817d2471c1e046dcc7485108e638` with execution `ERROR` and `ALREADY_PERFORMED`; state remained `true`.
 
-Full transaction/state detail is in [DEPLOYMENT.md](DEPLOYMENT.md), and machine-readable evidence is in [artifacts/studionet_proof.json](artifacts/studionet_proof.json).
+Full transaction/state detail is in [DEPLOYMENT.md](DEPLOYMENT.md), and machine-readable evidence is in [artifacts/studionet_proof.json](artifacts/studionet_proof.json). All cited live writes were checked for `FINALIZED`; successful transitions additionally require `MAJORITY_AGREE` and leader execution `SUCCESS`.
 
 ## Trust boundaries and limitations
 
-The impact vector is the consensus-bound decision-bearing output. Leader explanation and witness text are stored with `LEADER_REPORTED_NOT_CERTIFIED` provenance and are not presented as independently agreed facts. The model-mediated comparison is not a formal legal or mathematical proof. Party-wallet attestation is not legal identity verification. The controlled live fixture demonstrates the contract mechanics, not independent market discovery or commercial enforcement. The example consumer authorizes one head-pinned, one-shot action and holds no funds.
+The impact vector is the consensus-bound decision-bearing output. Leader explanation and witness text are stored with `LEADER_REPORTED_NOT_CERTIFIED` provenance and are not presented as independently agreed facts. The model-mediated comparison is not a formal legal or mathematical proof. Party-wallet attestation is not legal identity verification. The controlled live fixture demonstrates the contract mechanics, not independent market discovery or commercial enforcement. The active-slot recovery removes permanent terminal-proposal lockout but repeated cancellation can grow immutable history; enumeration is bounded to pages of at most 25 and writes do not scan history. The example consumer authorizes one head-pinned, one-shot action and holds no funds.

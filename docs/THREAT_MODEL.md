@@ -11,7 +11,7 @@
 | Malicious text prompt injection | Delimited untrusted content; validator independently processes same frozen inputs | General prompt-injection robustness cannot be mathematically guaranteed |
 | Proposal substitution after approval | Candidate text immutable, hashed, version/head bound | Participants should check receipt and exact candidate before approval |
 | Simultaneous proposals | First finalised advances head; others fail stale-check | Requires new proposal on new head |
-| Proposal-slot griefing | One submission opportunity per party per sealed head; adoption resets all slots; blocked/cancelled proposals consume only their proposer's slot | A party that uses its own slot must wait for head advancement; historical records are append-only and paginated |
+| Proposal-slot griefing and terminal deadlock | One active pending proposal per party/current head; only the proposer can cancel and only that exact slot is cleared; blocked `U` proposals are terminal and do not occupy a slot; adoption clears slots for the new head | Repeated cancellation can grow immutable history and consume transactions; history is paginated and writes do not scan it |
 | Historical-view exhaustion | Writes do not scan proposal history; agreement summary is bounded and proposal IDs have a max-25 page view | Total immutable history grows over successful or abandoned heads and must be paged |
 | Vote replay/duplicate | Per proposal/party bitmask; no implicit approvals | Wallet compromise outside contract scope |
 | Unilateral cancellation | Only proposer can cancel live proposal, cannot cancel adopted head | Pending proposal may remain indefinitely; no forced expiration |

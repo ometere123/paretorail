@@ -22,17 +22,26 @@ On finalisation, the new head incorporates genesis, predecessor, proposal id, fr
 ## Proposal liveness and history
 
 Submission capacity is scoped to the current sealed head rather than to a
-permanent agreement-wide lifetime counter. Each registered party has one
-proposal opportunity per head. A blocked or cancelled proposal consumes only
-the submitting party's opportunity, so one participant cannot exhaust the
-other parties' capacity. Adoption resets all party opportunities for the new
-head; old-head proposals become stale and cannot consume new-head capacity.
+permanent agreement-wide lifetime counter. Each registered party has at most
+one active pending proposal for the current head. A participant cannot submit
+a second pending proposal while its active proposal is live. The proposer may
+cancel that proposal, and cancellation clears only the matching proposer slot.
+A proposal whose semantic vector contains `U` is recorded as terminal
+`BLOCKED` and never occupies an active slot. Stale or terminal records also
+cannot occupy a slot. This means cancelled and all-terminal proposals cannot
+leave every participant permanently locked out while the head is unchanged.
 
-Proposal records are append-only and retain globally unique IDs. Because
-history can outlive a single fixed lifetime cap, `get_agreement()` exposes a
-bounded recent proposal window and `get_proposal_ids_page()` provides
-bounded historical enumeration (`limit <= 25`); individual old proposals
-remain directly readable with `get_proposal()`.
+Adoption clears every active slot for the new head; old-head proposals become
+stale and cannot consume new-head capacity. No recovery path changes the
+genesis, roster, quorum, current text or version, and no recovery path copies
+approval masks. Proposal records are append-only with globally unique IDs.
+
+Repeated cancellation can grow immutable history, which is the deliberate
+anti-spam trade-off for avoiding a permanent lifetime quota. State-changing
+methods do not scan history. `get_agreement()` exposes only a bounded recent
+window and `get_proposal_ids_page()` provides bounded historical enumeration
+(`limit <= 25`); individual old proposals remain directly readable with
+`get_proposal()`.
 
 ## Security intuition and limits
 

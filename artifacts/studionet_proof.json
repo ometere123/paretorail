@@ -2,31 +2,30 @@
   "network": "studionet",
   "chain_id": 61999,
   "rpc": "https://studio.genlayer.com/api",
+  "explorer": "https://explorer-studio.genlayer.com",
   "cli_version": "0.39.1",
   "genvm_version": "v0.2.12",
-  "source_commit": "83a2dbb53e247e54aa73f3224c174dcf6b1625f5",
-  "verification_ci": "https://github.com/ometere123/paretorail/actions/runs/38605324552",
+  "deployed_source_commit": "296eb2d77f2489379aa1f5cdc8c208b6b0f6f539",
   "contract": {
     "name": "ParetoRail",
-    "address": "0x45df5A40bf702306bd9A30Ae5Bec1847C2e6efE1",
-    "source_sha256": "f96cd5dc10d5ddbdfad3d573b50eb2533cda8d82c88695a47d6480b2199f0a32",
-    "source_bytes": 26200,
-    "deployment_tx": "0xec1809fb315effc9b7a37212fe508a2f005a0a16479e42bcfd6efb455f9f270d",
+    "address": "0x7a785f8790c44A470898D24772773E1A2713b15D",
+    "source_sha256": "fcda440704141cfca09fdf7db0bb0d29d538dc5aff9081ae0242adf20172247e",
+    "source_bytes": 26993,
+    "deployment_tx": "0x6c713238330a8252bd2858cc2c28863ef66c983e617abe81b5279c77f6c75a26",
     "receipt": "FINALIZED / MAJORITY_AGREE / SUCCESS",
-    "source_parity": "gen_getContractCode decoded exact byte and SHA-256 match",
-    "deployment_explorer": "https://explorer-studio.genlayer.com"
+    "source_parity": "gen_getContractCode returned exact committed bytes and SHA-256"
   },
   "consumer": {
     "name": "AmendedActionGate",
-    "address": "0xAA543bF4395A87A744fc4b5813BA6cc8960C18AE",
+    "address": "0x522984057CA9181417f8E97023EA6a02f9AA5121",
     "source_sha256": "2044110f4e6c20ade3335eabaf1765be71738440713ac6f81b6773fe4dc55c7c",
     "source_bytes": 1210,
-    "deployment_tx": "0x3a0948c43ff77efe22d3c57af30254f6b48604b76f28346a49f04fdb12e99a24",
+    "deployment_tx": "0x4e3d1ee0164f2419a17838ee615191575c7807f07a73203bd706d0446d4a2a01",
     "receipt": "FINALIZED / MAJORITY_AGREE / SUCCESS",
-    "bound_paretorail": "0x45df5A40bf702306bd9A30Ae5Bec1847C2e6efE1",
-    "proposal_id": 2,
-    "expected_head": "416b1751429f20d20e5c3c3edb6c884dd5fd36e5ff287fd51e4f6a643d5c8138",
-    "source_parity": "gen_getContractCode decoded exact byte and SHA-256 match"
+    "bound_paretorail": "0x7a785f8790c44A470898D24772773E1A2713b15D",
+    "proposal_id": 5,
+    "expected_head": "970ff648c7f9096b8acb5fb8ae3f900b85536768ab6de4899c9fede4b557ee46",
+    "source_parity": "gen_getContractCode returned exact committed bytes and SHA-256"
   },
   "accounts": {
     "buyer_creator": "0x951e6B75530774fF82321a5ae54e14F778F0C855",
@@ -35,42 +34,73 @@
   },
   "agreement": {
     "id": 1,
-    "purpose": "Three-party delivery and referral covenant",
-    "baseline_terms": "Buyer pays 50 GEN. Supplier delivers the service within five days. Referrer receives a ten percent referral share.",
-    "current_terms": "Buyer pays 50 GEN. Supplier delivers the service within five days. Referrer receives a ten percent referral share. Written notices are permitted",
+    "purpose": "Final recovery lifecycle",
+    "baseline_terms": "Buyer pays 50 GEN. Supplier delivers within five days. Referrer receives ten percent.",
+    "current_terms": "Buyer pays 50 GEN. Supplier delivers within five days. Referrer receives five percent.",
     "quorum": 2,
     "sealed": true,
-    "genesis_hash": "696cf2dfc942eab28678d6a961e0c0b881174d8e72ccf9978333ff3c5849e5b0",
-    "initial_head": "b820521e28def101514965baf518da6f22d938ea64f272070f10d6b73b052293",
+    "genesis_hash": "0eb4e805cfe0f17987d26f32fe4dbe2f80d4fff784088244927ef5c2e1ecce34",
+    "initial_head": "2b1c4fb351be47091ee8975cb185129a9160e95c1ef4e67a5463d97a0de6dec3",
     "final_version": 3,
-    "final_head": "416b1751429f20d20e5c3c3edb6c884dd5fd36e5ff287fd51e4f6a643d5c8138",
-    "proposal_ids": [1, 2, 3]
+    "final_head": "970ff648c7f9096b8acb5fb8ae3f900b85536768ab6de4899c9fede4b557ee46",
+    "proposal_ids": [1, 2, 3, 4, 5, 6]
   },
   "lifecycle": {
-    "create_agreement_tx": "0xb7dd01221408e3618f61ef349c5f7c199baf74f304234b545a8afaa844eb2b97",
-    "add_referrer_tx": "0x388e1f01a09dc0aeccb0fc75a79d85918ec6836381b1a59e1a4b69a5d2299903",
+    "create_agreement_tx": "0x817580c64f9c7e0e1414c6de705eb9e014615c461c9116e4d16584901beed252",
+    "unauthorized_add_party": {
+      "tx": "0x76ac9ef14ff1e979e7aee907395f9328616aa7a512e436d4d6a6059256fa8452",
+      "receipt": "FINALIZED / MAJORITY_AGREE / leader ERROR",
+      "state_change": false
+    },
+    "add_supplier_tx": "0xb970c405e8ee231318f874411c52ec0efaa0deaad627e62e61333335345c33bd",
+    "add_referrer_tx": "0xc905565eb3fb7c284843251e7f70b7264dab8419cfd72d9d0dc95a3eedddd603",
     "attestation_txs": [
-      "0x33c1eaeb41fb04e9cd1a7dcf0b6ab25ee274335ada12f22bb83387482dda4a97",
-      "0x4abf499382717ca945029e04b63ba4639e36eaac077734dddd71e06029daa4c5",
-      "0x9597a89be572bc4f8c2b16bdff7f30889550075f0611491e159f481ed393f2da"
+      "0x2978dbd2c7f20e408e71a5050fd2bde966e7051806ab05c1dc9072abdad65411",
+      "0x0a08ee9858236f8af3caed8f145fd9d1a722f50f421c5c80c168aff82a7d427d",
+      "0x66d620347fa4761df78d84c9e980f7622218def723443e68c84b2cfc35eaae93"
     ],
-    "seal_tx": "0xc3ae91645560df207a738c03ae15e544cb5efee1043e544ebf1e51abd03a3a46",
-    "rejected_price_increase": {"tx": "0xfaf7657bc4a6a59f9ec154804a2efbd4abab3710f1a4c79ec01bf6277c529904", "receipt": "FINALIZED / MAJORITY_DISAGREE", "impact_vector": "WNB", "state_change": false},
-    "rejected_deadline_weakening": {"tx": "0xa05a222d1370b7db925b6a726b522287cdf01b71976900a8972af9534855b2d7", "receipt": "FINALIZED / MAJORITY_DISAGREE", "impact_vector": "BWN", "state_change": false},
-    "rejected_hidden_worsening": {"tx": "0xcad9ab02190bad7f418d22d56944bd7d60eca62bb2eeca60b773b18ac88910a2", "receipt": "FINALIZED / MAJORITY_DISAGREE", "impact_vector": "NNW", "state_change": false},
-    "rejected_nonconvergent_candidate": {"tx": "0xa506f0e2d0bf8ffa042712635a58eb4df1d6b279459a1f95291b4ac8abfb4350", "receipt": "FINALIZED / MAJORITY_DISAGREE", "state_change": false},
-    "neutral_proposal_1": {"id": 1, "tx": "0x60ca881b3639c9070f2efb0084d3f27fbcab0eeaa63179a04dbab60026a9be4b", "impact_vector": "NNN", "captured_approval_txs": ["0xa1d322667667d7be8c4948192a404e050700351e304f69df7cadc7b2d4350e5c"], "approval_mask_readback": 3, "finalize_tx": "0x8919828e33e8908b93be12b90a26e424959a761d59c55b3bfad55cea393fd513", "adopted_head": "c45f36a5bf2509c699810517caace828e8003e7c3529ff19e78d76b546f5cf8c"},
-    "neutral_proposal_2": {"id": 2, "tx": "0xef12d4be231fba13d7167704c8681af3b26afdc29229c7cc701d3da3cd3b7caf", "impact_vector": "NNN", "approval_txs": ["0xfc4973a4266f00fc3643da1472fbb58c33e96b34d94d50a1dcc8903238402912", "0xf264271b80481d5825804b253b5e74e08f4abe91910eaf4260976bada2112f55"], "finalize_tx": "0x5bcb84001807d3661f67eafdb0916090aa45be684113a37f6e58d3d1a8d696d7", "adopted_head": "416b1751429f20d20e5c3c3edb6c884dd5fd36e5ff287fd51e4f6a643d5c8138"},
-    "same_party_quota_rejection": {"tx": "0x77700b82fecaae07032752511ebd87e5f0c76f977eb6e40922487160943bc16d", "receipt": "FINALIZED", "execution": "ERROR / PROPOSAL_QUOTA", "state_change": false},
-    "other_party_proposal": {"id": 3, "tx": "0xc29237a673e44c0fd88437a579fb9cf80b2edd346f26ec06378a596d4911d99b", "receipt": "FINALIZED / MAJORITY_AGREE", "status": "PENDING against prior head"},
-    "stale_rejection": {"tx": "0x87cb079aabf866b835843727635baa94dae8211e2b5f0ed396639648398b5bf0", "receipt": "FINALIZED", "execution": "ERROR / STALE_PROPOSAL", "state_change": false},
-    "consumer_perform": {"tx": "0x6642b5173651e0a019e5705fa292d6b7ae1a24b553bc762c7896a4eb5ee0826c", "receipt": "FINALIZED / MAJORITY_AGREE / SUCCESS", "was_performed": true},
-    "consumer_replay": {"tx": "0xe9b0b4b7c88934e881d3a7e3655694aa1254e67e608d2879030700cb0c3de3d4", "receipt": "FINALIZED / MAJORITY_AGREE", "execution": "ROLLBACK / ALREADY_PERFORMED", "was_performed_after": true}
+    "seal_tx": "0x7855820f2cc2165c5c790ad5aa94808b6da9daef26e566ff12a9042fcf70e61d",
+    "terminal_recovery": {
+      "rejected_consensus_tx": "0x15ec2b4d7b5a05546492e5ef65d4699abbc0a08c28f974f89cd3972f19a8d4d7",
+      "proposal_1": {"id": 1, "tx": "0x5a750883e04ffcf5e01e527dcfa772b6491bd3b7d7033a4ceb46f39df046ddc1", "vector": "NNN", "cancel_tx": "0x8549b99249ccbea88fb6c36d99cf1aeafbbde9a8423a496a9f046b7eac85f876"},
+      "proposal_2": {"id": 2, "tx": "0x6c42e6709dc2ba00b385048c7e56885d4d09e650856a256e01aa011b0389170b", "vector": "NNN", "cancel_tx": "0x08aff0e95b116b6fb37a441341df93b01fbd494974665f454c669c507dc7a22c"},
+      "replacement_proposal_3": {"id": 3, "tx": "0x16d5cb9735e46543e2b5f08cd4c00c744d618c014f96922ec19436039f27c950", "base_head_unchanged": true},
+      "replacement_proposal_4": {"id": 4, "tx": "0x556b2f45d63a7b99e6ab6b9ace650dd7e6cbf9f29326797487b0c91c09d0c335", "base_head_unchanged": true},
+      "proposal_4_approval_txs": ["0xf5564dae2d268bd4664b1a1d6b4059511fa0b069b19e44c237bc82c17a8c5fe7", "0xd89378eb8c99c5169b91f379ab502aa5f7b1e686d34f4258af7df1ec028ae00d"],
+      "proposal_4_finalize_tx": "0x79151362ebf0bf4c81da90f42bf4993b485514d0d91bb6d7891e0e7fb17eccb2",
+      "stale_proposal_3_approval_tx": "0xbfebc1a55adee5fd5436d2f8f04261586bfa714dbfcf49da0b330e1ee5b0a7a1",
+      "stale_execution": "FINALIZED / MAJORITY_AGREE / leader ERROR / STALE_PROPOSAL",
+      "history_readback": [1, 2, 3, 4]
+    },
+    "adverse_proposal": {
+      "id": 5,
+      "tx": "0x562f171674faf0ef062ae6d67321c01c1dc38e370e23d8378957f5f382170fad",
+      "impact_vector": "NNW",
+      "impacted_mask": 4,
+      "quorum_without_harmed_consent": {
+        "approval_txs": ["0xdbe4039e4e5afae0a59b2162164d4c082e0f216de7707d9545cae330ac27c", "0xc2ebcd296afeec32a447a0365cc4dfaebf6a6674bbb6738915b529cc5cff2dd7"],
+        "approvals_mask": 3,
+        "can_finalize": false
+      },
+      "harmed_party_approval_tx": "0xc242df147129542d4b0bf8b0da17b23c66bfd47c16566b0fe5a72d89cafb22be",
+      "approval_readback_after_harmed_party": {"approvals_mask": 7, "can_finalize": true},
+      "finalize_tx": "0x09086816f798cc4e462169710e7f850da5f7aa1b3dca35327edcb86c435ce7a0",
+      "final_readback": {"version": 3, "head": "970ff648c7f9096b8acb5fb8ae3f900b85536768ab6de4899c9fede4b557ee46", "current_terms": "Buyer pays 50 GEN. Supplier delivers within five days. Referrer receives five percent."}
+    },
+    "vague_candidate": {
+      "tx": "0x495829ebc61f2b6af062c4ea6748c0288d492b732d643f32d9a62983e277037d",
+      "observed_vector": "WWW",
+      "status": "PENDING",
+      "cancel_tx": "0xa28b9f9c95461c5fff8dccfd5a10b77be021be8f0489c132feea268f006f71b6",
+      "state_change": false
+    },
+    "consumer_perform": {"tx": "0x66315c086eb4126785412ace1d91ec7a9cfab2e3b342ee3ea443bfe67045e93", "receipt": "FINALIZED / MAJORITY_AGREE / SUCCESS", "was_performed": true},
+    "consumer_replay": {"tx": "0xe7c1072219051b0e3bb36901e37dbe725210817d2471c1e046dcc7485108e638", "receipt": "FINALIZED / MAJORITY_AGREE / leader ERROR / ALREADY_PERFORMED", "was_performed_after": true}
   },
   "tests": {
-    "offline": "36/36 passed",
-    "official_direct_mode": "14/14 passed",
-    "mutation": "10/10 killed",
+    "offline": "40/40 passed",
+    "official_direct_mode": "16/16 passed",
+    "mutation": "13/13 killed",
     "lint": "3/3 per contract",
     "semantic_validation": "passed for both contracts",
     "preflight": "passed",
@@ -80,6 +110,7 @@
     "The impact vector is consensus-bound; leader reason and witness are LEADER_REPORTED_NOT_CERTIFIED.",
     "Wallet attestation is not legal identity proof.",
     "The live text fixture is repository-controlled evidence, not independent commercial-market evidence.",
+    "Active-slot recovery permits repeated cancellation; immutable history can grow and must be paged.",
     "The consumer is a one-shot authorization example and holds no funds."
   ]
 }

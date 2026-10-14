@@ -18,3 +18,22 @@ The following deployment was the pre-hardening deployment. It is retained for au
 - immutable binding: proposal `4`, head `cda68fa595c6064411be0eed3b0a888a5872551c8ac4d9f1418807061e402cdd`
 
 The complete machine-readable record from that deployment is preserved at [`artifacts/studionet_proof_historical_690b6e.json`](../artifacts/studionet_proof_historical_690b6e.json). Those addresses, transactions and readbacks must not be presented as evidence for the corrected deployment at `0x45df5A40bf702306bd9A30Ae5Bec1847C2e6efE1`.
+
+## Superseded corrected deployment (pre-recovery)
+
+The following deployment contained the earlier per-party/per-head lifetime-opportunity implementation. It is retained as historical evidence because the final source replaces its terminal-proposal capacity behavior with recoverable active slots.
+
+- ParetoRail: `0x45df5A40bf702306bd9A30Ae5Bec1847C2e6efE1`
+- deployment transaction: `0xec1809fb315effc9b7a37212fe508a2f005a0a16479e42bcfd6efb455f9f270d`
+- source commit: `83a2dbb53e247e54aa73f3224c174dcf6b1625f5`
+- source SHA-256: `f96cd5dc10d5ddbdfad3d573b50eb2533cda8d82c88695a47d6480b2199f0a32`
+- source bytes: `26,200`
+
+### Superseded corrected consumer
+
+- AmendedActionGate: `0xAA543bF4395A87A744fc4b5813BA6cc8960C18AE`
+- deployment transaction: `0x3a0948c43ff77efe22d3c57af30254f6b48604b76f28346a49f04fdb12e99a24`
+- immutable binding: ParetoRail `0x45df5A40bf702306bd9A30Ae5Bec1847C2e6efE1`, proposal `2`, head `416b1751429f20d20e5c3c3edb6c884dd5fd36e5ff287fd51e4f6a643d5c8138`
+- source SHA-256: `2044110f4e6c20ade3335eabaf1765be71738440713ac6f81b6773fe4dc55c7c`
+
+The machine-readable pre-recovery record is preserved at [`artifacts/studionet_proof_historical_06ed.json`](../artifacts/studionet_proof_historical_06ed.json). It must not be presented as evidence for the final deployment at `0x7a785f8790c44A470898D24772773E1A2713b15D`.
