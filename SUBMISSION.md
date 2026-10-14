@@ -9,6 +9,7 @@ ParetoRail is a contract-only GenLayer primitive for consent-safe amendments to 
 - Repository-local CLI: `genlayer@0.39.1`
 - ParetoRail: `0x3cF4773bAC377CeaA3f90b5AE3bC1E317F315411`
 - Deployment transaction: `0xf054cc46ea3677d9aa5aa5012f1393fc644bc871beb96252ccd72a4472db13cd`
+- Deployed source commit: `380e81b08518ea57be66fdc6c64d693c8e011cd6`
 - Deployment outcome: `FINALIZED / MAJORITY_AGREE / SUCCESS`
 - ParetoRail source SHA-256: `f19d28c009259ddf22c289936beb43b7d7c064dcaa83f69e7049ff314580215d`
 - Deployed-source parity: exact byte count and SHA-256 match (`23,686` bytes)

@@ -10,7 +10,7 @@ This is the factual deployment record for the supplied contract-only ParetoRail 
 
 ## Source and deployment
 
-The deployed commit is the source commit containing the unchanged ParetoRail contract and the test/tooling corrections in this repository. The contract source is 23,686 bytes and SHA-256:
+The deployed contract source was committed at `380e81b08518ea57be66fdc6c64d693c8e011cd6`. The current `main` merge commit contains that exact source file unchanged. The contract source is 23,686 bytes and SHA-256:
 
 ```text
 f19d28c009259ddf22c289936beb43b7d7c064dcaa83f69e7049ff314580215d
