@@ -36,7 +36,7 @@ class Map(dict):
             if self.typ.__name__ == 'Agreement':
                 entry.party_ids = Array()
                 entry.proposal_ids = Array()
-                entry.head_proposal_counts = Array()
+                entry.active_proposal_ids = Array()
             self[key] = entry
         return self[key]
 
@@ -382,6 +382,7 @@ def test_per_party_head_quota_preserves_other_parties_and_resets_after_adoption(
     actor(gl, A); c.approve(first)
     actor(gl, B); c.approve(first)
     new_head = c.finalize_amendment(first)
+    assert c.agreements[aid].active_proposal_ids == [0, 0, 0]
     with pytest.raises(ValueError, match='STALE_PROPOSAL'):
         c.approve(second)
     actor(gl, A)
@@ -389,18 +390,121 @@ def test_per_party_head_quota_preserves_other_parties_and_resets_after_adoption(
     assert third > second
 
 
-def test_cancelled_proposal_consumes_only_proposer_slot(core):
+def test_cancelled_proposal_releases_only_proposer_slot(core):
     _, c, gl = core
     aid, head = setup(core)
     gl.nondet.leader = verdict('NNN')
     first = c.propose_amendment(aid, 'Buyer pays 50 GEN. Bob delivers in six days. Carol receives ten percent.', head)
     actor(gl, A)
     c.cancel_proposal(first)
-    with pytest.raises(ValueError, match='PROPOSAL_QUOTA'):
-        c.propose_amendment(aid, 'Buyer pays 50 GEN. Bob delivers in seven days. Carol receives ten percent.', head)
+    assert c.agreements[aid].active_proposal_ids == [0, 0, 0]
+    replacement = c.propose_amendment(
+        aid, 'Buyer pays 50 GEN. Bob delivers in seven days. Carol receives ten percent.', head)
+    assert c.get_proposal(replacement)['status'] == 1
     actor(gl, B)
     second = c.propose_amendment(aid, 'Buyer pays 50 GEN. Bob delivers in nine days. Carol receives ten percent.', head)
-    assert second != first
+    assert second > replacement
+
+
+def test_blocked_proposal_releases_proposer_slot_without_head_change(core):
+    _, c, gl = core
+    aid, head = setup(core)
+    original = c.get_agreement(aid)
+    gl.nondet.leader = verdict('UUU')
+
+    actor(gl, A)
+    first = c.propose_amendment(
+        aid, 'Buyer pays 50 GEN. Bob delivers in six days. Carol receives ten percent.', head)
+    assert c.get_proposal(first)['status'] == 2
+    assert c.agreements[aid].active_proposal_ids == [0, 0, 0]
+
+    second = c.propose_amendment(
+        aid, 'Buyer pays 50 GEN. Bob delivers in seven days. Carol receives ten percent.', head)
+    assert c.get_proposal(second)['status'] == 2
+
+    actor(gl, B)
+    third = c.propose_amendment(
+        aid, 'Buyer pays 50 GEN. Bob delivers in eight days. Carol receives ten percent.', head)
+    assert c.get_proposal(third)['status'] == 2
+    current = c.get_agreement(aid)
+    assert current['genesis_hash'] == original['genesis_hash']
+    assert current['head_hash'] == original['head_hash'] == head
+    assert current['version'] == original['version'] == 1
+    assert current['proposal_count'] == 3
+
+
+def test_active_pending_slot_is_exclusive_and_terminal_history_is_immutable(core):
+    _, c, gl = core
+    aid, head = setup(core)
+    gl.nondet.leader = verdict('NNN')
+    actor(gl, A)
+    first = c.propose_amendment(
+        aid, 'Buyer pays 50 GEN. Bob delivers in six days. Carol receives ten percent.', head)
+    with pytest.raises(ValueError, match='PROPOSAL_QUOTA'):
+        c.propose_amendment(
+            aid, 'Buyer pays 50 GEN. Bob delivers in seven days. Carol receives ten percent.', head)
+    c.cancel_proposal(first)
+    stored = c.get_proposal(first)
+    assert stored['status'] == 4
+    assert stored['new_terms_hash'] == c.get_proposal(first)['new_terms_hash']
+    replacement = c.propose_amendment(
+        aid, 'Buyer pays 50 GEN. Bob delivers in eight days. Carol receives ten percent.', head)
+    assert replacement != first
+    assert c.get_proposal(first)['status'] == 4
+
+
+def test_cancellation_clears_only_the_proposer_slot(core):
+    _, c, gl = core
+    aid, head = setup(core)
+    gl.nondet.leader = verdict('NNN')
+    actor(gl, A)
+    first = c.propose_amendment(
+        aid, 'Buyer pays 50 GEN. Bob delivers in six days. Carol receives ten percent.', head)
+    actor(gl, B)
+    second = c.propose_amendment(
+        aid, 'Buyer pays 50 GEN. Bob delivers in seven days. Carol receives ten percent.', head)
+    c.cancel_proposal(second)
+    assert c.agreements[aid].active_proposal_ids == [first, 0, 0]
+    replacement = c.propose_amendment(
+        aid, 'Buyer pays 50 GEN. Bob delivers in eight days. Carol receives ten percent.', head)
+    assert replacement > second
+    actor(gl, A)
+    with pytest.raises(ValueError, match='PROPOSAL_QUOTA'):
+        c.propose_amendment(
+            aid, 'Buyer pays 50 GEN. Bob delivers in nine days. Carol receives ten percent.', head)
+
+
+def test_all_participants_terminal_proposals_do_not_deadlock_same_head(core):
+    """Regression reproducer for the old one-shot-per-head deadlock."""
+    _, c, gl = core
+    aid = c.create_agreement('Two-party delivery agreement', BASE, 'Buyer', Int(2))
+    c.add_party(aid, B, 'Supplier')
+    for who in (A, B):
+        actor(gl, who)
+        c.attest_initial(aid)
+    actor(gl, A)
+    head = c.seal_agreement(aid)
+    gl.nondet.leader = verdict('NN')
+
+    actor(gl, A)
+    first = c.propose_amendment(
+        aid, 'Alice pays 50 GEN. Bob delivers in six days.', head)
+    c.cancel_proposal(first)
+
+    actor(gl, B)
+    second = c.propose_amendment(
+        aid, 'Alice pays 50 GEN. Bob delivers in seven days.', head)
+    c.cancel_proposal(second)
+
+    # The old permanent quota rejected both calls with PROPOSAL_QUOTA.
+    actor(gl, A)
+    third = c.propose_amendment(
+        aid, 'Alice pays 50 GEN. Bob delivers in eight days.', head)
+    actor(gl, B)
+    fourth = c.propose_amendment(
+        aid, 'Alice pays 50 GEN. Bob delivers in nine days.', head)
+    assert third > second
+    assert fourth > third
 
 
 def test_proposal_history_is_bounded_and_paginated(core):

@@ -60,19 +60,34 @@ MUTATIONS = [
         'test_duplicate_votes_and_withdrawal',
     ),
     (
-        'remove per-party quota',
-        [('if int(a.head_proposal_counts[party_index]) >= MAX_PROPOSALS_PER_PARTY_PER_HEAD:', 'if False:')],
+        'bypass active pending exclusivity',
+        [('if (active is not None and int(active.status) == STATUS_PENDING and', 'if False and (active is not None and int(active.status) == STATUS_PENDING and')],
+        'test_active_pending_slot_is_exclusive_and_terminal_history_is_immutable',
+    ),
+    (
+        'terminal cancellation does not release slot',
+        [('if int(a.active_proposal_ids[party_index]) == int(proposal_id):', 'if False:')],
+        'test_cancelled_proposal_releases_only_proposer_slot',
+    ),
+    (
+        'blocked proposal occupies active slot',
+        [("if int(p.status) == STATUS_PENDING:", 'if True:')],
+        'test_blocked_proposal_releases_proposer_slot_without_head_change',
+    ),
+    (
+        'remove active-slot reset after adoption',
+        [('self._reset_active_proposals(a)', 'if False:\n            self._reset_active_proposals(a)')],
         'test_per_party_head_quota_preserves_other_parties_and_resets_after_adoption',
     ),
     (
-        'restore shared proposal cap',
-        [('if int(a.head_proposal_counts[party_index]) >= MAX_PROPOSALS_PER_PARTY_PER_HEAD:', 'if len(a.proposal_ids) >= 1:')],
-        'test_per_party_head_quota_preserves_other_parties_and_resets_after_adoption',
+        'clear the wrong participant slot on cancellation',
+        [('party_index = self._participant(a, gl.message.sender_address)\n        if int(a.active_proposal_ids[party_index]) == int(proposal_id):', 'party_index = 0\n        if int(a.active_proposal_ids[party_index]) == int(proposal_id):')],
+        'test_cancellation_clears_only_the_proposer_slot',
     ),
     (
-        'remove quota reset after adoption',
-        [('self._reset_head_proposal_counts(a)', 'if False:\n            self._reset_head_proposal_counts(a)')],
-        'test_per_party_head_quota_preserves_other_parties_and_resets_after_adoption',
+        'reuse an approval mask during recovery',
+        [('p.approvals_mask = u32(0)', 'p.approvals_mask = u32(1)')],
+        'test_no_worsening_still_requires_quorum',
     ),
 ]
 

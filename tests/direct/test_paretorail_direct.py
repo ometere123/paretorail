@@ -238,19 +238,79 @@ def test_direct_cancelled_proposal_does_not_consume_other_party_quota(direct_vm,
     )
     direct_vm.sender = direct_alice
     c.cancel_proposal(first)
-    with direct_vm.expect_revert('PROPOSAL_QUOTA'):
-        c.propose_amendment(
-            aid,
-            'Buyer pays 50 GEN. Supplier delivers within seven days. Referrer receives ten percent.',
-            head,
-        )
+    replacement = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within seven days. Referrer receives ten percent.',
+        head,
+    )
+    assert replacement > first
     direct_vm.sender = direct_bob
     second = c.propose_amendment(
         aid,
         'Buyer pays 50 GEN. Supplier delivers within nine days. Referrer receives ten percent.',
         head,
     )
-    assert second > first
+    assert second > replacement
+
+
+def test_direct_all_terminal_proposals_recover_every_party_slot(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie):
+    """Every party can recover after all same-head proposals are cancelled."""
+    c, aid, head = _setup(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie)
+    _mock(direct_vm, 'NNN')
+    direct_vm.sender = direct_alice
+    first = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within six days. Referrer receives ten percent.',
+        head,
+    )
+    c.cancel_proposal(first)
+    direct_vm.sender = direct_bob
+    second = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within seven days. Referrer receives ten percent.',
+        head,
+    )
+    c.cancel_proposal(second)
+
+    direct_vm.sender = direct_alice
+    third = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within eight days. Referrer receives ten percent.',
+        head,
+    )
+    direct_vm.sender = direct_bob
+    fourth = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within nine days. Referrer receives ten percent.',
+        head,
+    )
+    assert third > second
+    assert fourth > third
+
+
+def test_direct_unknown_proposals_are_terminal_and_recoverable(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie):
+    c, aid, head = _setup(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie)
+    _mock(direct_vm, 'UUU')
+    direct_vm.sender = direct_alice
+    first = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within six days. Referrer receives ten percent.',
+        head,
+    )
+    assert c.get_proposal(first)['status'] == 2
+    second = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within seven days. Referrer receives ten percent.',
+        head,
+    )
+    assert c.get_proposal(second)['status'] == 2
+    direct_vm.sender = direct_bob
+    third = c.propose_amendment(
+        aid,
+        'Buyer pays 50 GEN. Supplier delivers within eight days. Referrer receives ten percent.',
+        head,
+    )
+    assert c.get_proposal(third)['status'] == 2
 
 
 def test_direct_adversarial_audit_cannot_report_non_positive_party(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie):

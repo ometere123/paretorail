@@ -14,10 +14,11 @@ MAX_TERMS = 3500
 MAX_ROLE = 120
 MAX_REASON = 80
 MAX_WITNESS = 300
-# Each roster party gets one independent proposal opportunity per sealed head.
-# A blocked/cancelled proposal consumes only its proposer's opportunity; the
-# other parties retain theirs.  Opportunities reset only after adoption.
-MAX_PROPOSALS_PER_PARTY_PER_HEAD = 1
+# Each roster party may have at most one live proposal against the current
+# head.  Terminal proposals release only their proposer's slot; adoption clears
+# all old-head slots.  This preserves independent capacity without creating a
+# permanent one-shot allowance for a sealed head.
+MAX_ACTIVE_PROPOSALS_PER_PARTY = 1
 MAX_PROPOSAL_PAGE = 25
 
 IMPACT_NEUTRAL = 'N'
@@ -155,7 +156,7 @@ class Agreement:
     head_hash: str
     party_ids: DynArray[u256]
     proposal_ids: DynArray[u256]
-    head_proposal_counts: DynArray[u8]
+    active_proposal_ids: DynArray[u256]
 
 
 @allow_storage
@@ -339,7 +340,7 @@ class ParetoRail(gl.Contract):
         p.role = creator_role
         p.attested_revision = u32(0)
         a.party_ids.append(pid)
-        a.head_proposal_counts.append(u8(0))
+        a.active_proposal_ids.append(u256(0))
         return aid
 
     @gl.public.write
@@ -365,7 +366,7 @@ class ParetoRail(gl.Contract):
         p.role = role
         p.attested_revision = u32(0)
         a.party_ids.append(pid)
-        a.head_proposal_counts.append(u8(0))
+        a.active_proposal_ids.append(u256(0))
         a.roster_revision = u32(int(a.roster_revision) + 1)
         return pid
 
@@ -409,8 +410,17 @@ class ParetoRail(gl.Contract):
             raise gl.vm.UserError('STALE_HEAD')
         if _hash(new_terms) == _hash(str(a.current_terms)):
             raise gl.vm.UserError('UNCHANGED_TERMS')
-        if int(a.head_proposal_counts[party_index]) >= MAX_PROPOSALS_PER_PARTY_PER_HEAD:
-            raise gl.vm.UserError('PROPOSAL_QUOTA')
+        # Only a genuinely pending proposal occupies a current-head slot.
+        # Terminal or old-head records are immutable history and cannot block
+        # a fresh proposal by the same party.
+        active_id = int(a.active_proposal_ids[party_index])
+        if active_id != 0:
+            active = self.proposals.get(u256(active_id))
+            if (active is not None and int(active.status) == STATUS_PENDING and
+                    str(active.base_head_hash) == str(a.head_hash) and
+                    int(active.base_version) == int(a.version)):
+                raise gl.vm.UserError('PROPOSAL_QUOTA')
+            a.active_proposal_ids[party_index] = u256(0)
         original_head = str(a.head_hash)
         assessment = self._consensus(a, str(a.current_terms), new_terms)
         count = len(a.party_ids)
@@ -442,14 +452,15 @@ class ParetoRail(gl.Contract):
             'base_head':original_head,'candidate_hash':str(p.new_terms_hash),
             'roster_hash':str(a.genesis_hash),'impact_vector':str(p.impact_vector)}))
         a.proposal_ids.append(prop_id)
-        a.head_proposal_counts[party_index] = u8(int(a.head_proposal_counts[party_index]) + 1)
+        if int(p.status) == STATUS_PENDING:
+            a.active_proposal_ids[party_index] = u256(int(prop_id))
         AmendmentProposed(prop_id, agreement_id, p.status, vector=str(p.impact_vector)).emit()
         return prop_id
 
-    def _reset_head_proposal_counts(self, a: Agreement) -> None:
+    def _reset_active_proposals(self, a: Agreement) -> None:
         # MAX_PARTIES bounds this loop independently of proposal history.
-        for i in range(len(a.head_proposal_counts)):
-            a.head_proposal_counts[i] = u8(0)
+        for i in range(len(a.active_proposal_ids)):
+            a.active_proposal_ids[i] = u256(0)
 
     def _live(self, p: Proposal, a: Agreement) -> None:
         if int(p.status) != STATUS_PENDING:
@@ -489,6 +500,9 @@ class ParetoRail(gl.Contract):
         if p.proposer != gl.message.sender_address:
             raise gl.vm.UserError('ONLY_PROPOSER')
         p.status = u8(STATUS_CANCELLED)
+        party_index = self._participant(a, gl.message.sender_address)
+        if int(a.active_proposal_ids[party_index]) == int(proposal_id):
+            a.active_proposal_ids[party_index] = u256(0)
 
     def _finalizable(self, p: Proposal, a: Agreement) -> bool:
         if int(p.status) != STATUS_PENDING or str(a.head_hash) != str(p.base_head_hash):
@@ -520,7 +534,7 @@ class ParetoRail(gl.Contract):
         a.current_terms = p.new_terms
         a.head_hash = next_head
         a.version = u32(new_version)
-        self._reset_head_proposal_counts(a)
+        self._reset_active_proposals(a)
         p.status = u8(STATUS_ADOPTED)
         p.adoption_head_hash = next_head
         AmendmentAdopted(proposal_id, p.agreement_id, a.version, head_hash=next_head).emit()
