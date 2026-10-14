@@ -6,6 +6,7 @@
   "cli_version": "0.39.1",
   "genvm_version": "v0.2.12",
   "deployed_source_commit": "296eb2d77f2489379aa1f5cdc8c208b6b0f6f539",
+  "verification_ci": "https://github.com/ometere123/paretorail/actions/runs/38626366755",
   "contract": {
     "name": "ParetoRail",
     "address": "0x7a785f8790c44A470898D24772773E1A2713b15D",

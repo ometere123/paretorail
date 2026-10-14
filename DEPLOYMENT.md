@@ -14,6 +14,7 @@ This is the final corrected deployment record for the contract-only ParetoRail r
 - ParetoRail source: `26,993` bytes, SHA-256 `fcda440704141cfca09fdf7db0bb0d29d538dc5aff9081ae0242adf20172247e`
 - Consumer source: `1,210` bytes, SHA-256 `2044110f4e6c20ade3335eabaf1765be71738440713ac6f81b6773fe4dc55c7c`
 - The stable network guard and RPC chain-ID guard returned `61999` before deployment. No preview RPC or chain `61997` was used.
+- Source verification CI: [run 38626366755](https://github.com/ometere123/paretorail/actions/runs/38626366755), green for the final recovery source and evidence commit `27cfc78359185790d572abac860b7ad2bce6081c`.
 
 ## Final ParetoRail
 

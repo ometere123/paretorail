@@ -18,7 +18,7 @@ ParetoRail is a contract-only GenLayer primitive for consent-safe amendments to 
 - Consumer deployment outcome: `FINALIZED / MAJORITY_AGREE / SUCCESS`
 - Consumer binding: ParetoRail above, proposal `5`, adopted head `970ff648c7f9096b8acb5fb8ae3f900b85536768ab6de4899c9fede4b557ee46`
 - Consumer source: `1,210` bytes, SHA-256 `2044110f4e6c20ade3335eabaf1765be71738440713ac6f81b6773fe4dc55c7c`, exact deployed parity
-- Final CI run: to be recorded after this final evidence commit is pushed; the deployed contract source was tested and deployed from `296eb2d`
+- Source verification CI: [run 38626366755](https://github.com/ometere123/paretorail/actions/runs/38626366755), green for source commit `27cfc78359185790d572abac860b7ad2bce6081c`
 
 The prior corrected deployment (`0x45df5A40bf702306bd9A30Ae5Bec1847C2e6efE1`) is historical only and is preserved in [docs/HISTORY.md](docs/HISTORY.md) and [artifacts/studionet_proof_historical_06ed.json](artifacts/studionet_proof_historical_06ed.json).
 
