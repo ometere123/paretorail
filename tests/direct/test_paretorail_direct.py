@@ -10,7 +10,10 @@ AMEND = 'Buyer pays 50 GEN. Supplier delivers within eight days. Referrer receiv
 
 def _setup(direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie):
     direct_vm.sender = direct_alice
-    c = direct_deploy('contracts/paretorail.py')
+    # Pin the Direct Mode artifact to the stable GenVM used by Studionet.
+    # Without this explicit version, a clean runner asks genlayer-test to
+    # discover the latest release, which may be an unavailable RC artifact.
+    c = direct_deploy('contracts/paretorail.py', sdk_version='v0.2.12')
     aid = c.create_agreement('Delivery and referral', BASE, 'Buyer', 2)
     # genlayer-test exposes account fixtures as bytes while the contract ABI
     # requires the SDK Address wrapper for stored Address arguments.
