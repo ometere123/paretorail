@@ -1,0 +1,1 @@
+{"name":"paretorail-studionet","version":"1.0.0","private":true,"description":"Standalone GenLayer Intelligent Contract primitive; stable StudioNet 61999","scripts":{"cli":"genlayer","network:check":"node scripts/network-guard.cjs","preflight":"python scripts/preflight.py","test:offline":"python -m pytest tests/test_offline.py -q"},"devDependencies":{"genlayer":"0.39.1"}}

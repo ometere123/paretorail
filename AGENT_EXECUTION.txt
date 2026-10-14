@@ -1,0 +1,20 @@
+PARETORAIL - CODEX/CLAUDE FINISHING INSTRUCTIONS
+
+You are inside an existing unzipped contract-only ParetoRail repository. Do NOT clone another project, rebuild from scratch, or introduce a frontend/backend.
+Target existing repo: https://github.com/ometere123/paretorail
+
+Non-negotiable network: stable studionet, 61999, https://studio.genlayer.com/api.
+NON-negotiable CLI: repository-local genlayer@0.39.1.
+PC's globally installed genlayer 0.40.0rc2 is incompatible. NEVER invoke bare `genlayer` or use studio-dev, studio-next, chain 61997 or CLI 0.40.x. Stop on any mismatch.
+
+READ README.md, docs/CONSENSUS.md, docs/THREAT_MODEL.md, docs/STUDIONET_EXECUTION.md and every contract/test file before changing anything.
+
+1. npm install --no-audit --no-fund; verify ./node_modules/.bin/genlayer --version prints 0.39.1. Commit the generated package-lock.json. ./node_modules/.bin/genlayer network set studionet; node scripts/network-guard.cjs; python scripts/rpc-guard.py.
+2. Use Python >=3.12, python -m pip install -r requirements-direct.txt. Run python -m pytest tests/test_offline.py -q, python -m pytest tests/direct -v, genvm-lint check contracts/paretorail.py, python scripts/preflight.py. Fix real stable-SDK/GenVM errors only, preserve business invariants, and add regressions.
+3. Deeply audit creator authorization, roster revision and attestations, harmed-party mask, vote bitmask, stale competing proposals, withdrawal, adopter one-shot, semantic vector ordering, malformed/prompt-injected model outputs, adversarial validator and any storage/runtime incompatibility. All new tests must execute rather than just be source-level claims.
+4. Deploy contracts/paretorail.py to verified StudioNet 61999 via ./node_modules/.bin/genlayer deploy --contract contracts/paretorail.py --rpc https://studio.genlayer.com/api. Use funded StudioNet unlocked account. No private keys in repository or logs. Never send from unknown network.
+5. Run complete live economic-free lifecycle with three distinct wallet accounts, collect actual finalized transactions and authoritative state readbacks. Exercise blocked amendment, harmed-party consent, successful amendment, stale concurrency, replay. Optional small consumer example for typed IC-to-IC read. Do not claim live proofs before they occur; no fabricated hashes or addresses.
+6. Review source SHA and deployment/source parity. Ensure checks/workflows pass for the final commit. Push to https://github.com/ometere123/paretorail main only if remote is empty or reconcile any new commits safely. Never force push and never push secrets.
+7. Final report with exact commit SHA, contract address, deploy/source hash, tests (mock vs Direct Mode vs live), CI URL, actual explorer tx links, unresolved limitations. If any external requirement is unavailable, report exact blocker and never substitute Studio Dev/61997.
+
+IMPORTANT SEMANTICS: Pareto means no *unconsented* party-specific material worsening under quorum; ANY material worsening requires that affected party's explicit approval even if offset by benefits. Unclear impact blocks; proposer cannot inject or bypass consent. Leader's prose is not certified. The independent verifier MUST compare the full vector and adversarially search for missed harm. Do not add scoring promises to documentation.

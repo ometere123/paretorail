@@ -1,0 +1,37 @@
+name: Contract-only tests (stable toolchain)
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Offline dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Offline tests
+        run: python -m pytest tests/test_offline.py -v
+      - name: Structural preflight
+        run: python scripts/preflight.py
+      - name: GenLayer Direct Mode and linter dependencies
+        run: python -m pip install -r requirements-direct.txt
+      - name: Stable GenVM lint
+        run: genvm-lint check contracts/paretorail.py
+      - name: Consumer GenVM lint
+        run: genvm-lint check contracts/consumer_example.py
+      - name: Direct Mode
+        run: python -m pytest tests/direct -v
+  cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install pinned local CLI only
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Verify CLI version without global fallback
+        run: node -e "const p=require('./node_modules/genlayer/package.json'); if(p.version!=='0.39.1')process.exit(1); console.log(p.version)"
